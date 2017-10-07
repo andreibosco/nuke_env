@@ -1,0 +1,122 @@
+Gizmo {
+ name WrapAround
+ addUserKnob {20 User}
+ addUserKnob {41 translate T Controls.translate}
+ addUserKnob {41 center T Controls.center}
+ addUserKnob {41 rotate T Controls.rotate}
+ addUserKnob {41 scale T Controls.scale}
+ addUserKnob {3 repeat t 1}
+ repeat 1
+ addUserKnob {3 tile -STARTLINE}
+ tile 1
+ addUserKnob {41 mirrorx l "mirror x" -STARTLINE T Tile1.mirrorCols}
+ addUserKnob {41 mirrory l "mirror y" -STARTLINE T Tile1.mirrorRows}
+ addUserKnob {41 motionblur T Controls.motionblur}
+ addUserKnob {41 shutter T Controls.shutter}
+ addUserKnob {41 shutteroffset l "shutter offset" T Controls.shutteroffset}
+ addUserKnob {41 shuttercustomoffset l "" -STARTLINE T Controls.shuttercustomoffset}
+ addUserKnob {41 filter T Controls.filter}
+ addUserKnob {26 author l "" +STARTLINE T "<a style=\"color:#444;font-size:9px;text-decoration:none;\" href=\"http://www.vladislavbakic.com\">vladislavbakic.com</a>"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 464
+  ypos -15
+ }
+ Reformat {
+  type "to box"
+  box_width {{input.width*Tile1.columns}}
+  box_height {{input.height*Tile1.rows}}
+  box_fixed true
+  filter Impulse
+  name Reformat1
+  xpos 464
+  ypos 20
+ }
+ Tile {
+  rows {{"repeat >=1 ? (repeat*2)+1 : 3"}}
+  columns {{"repeat >=1 ? (repeat*2)+1 : 3"}}
+  filter Impulse
+  name Tile1
+  xpos 464
+  ypos 58
+ }
+ Tile {
+  rows {{tile 1 l 1}}
+  mirrorRows {{Tile1.mirrorRows}}
+  columns {{tile 1 l 1}}
+  mirrorCols {{Tile1.mirrorCols}}
+  filter {{"rows > 1 ? Controls.filter : 0"}}
+  name Tile2
+  xpos 464
+  ypos 91
+ }
+ Transform {
+  translate {{"-(input.width/Tile1.columns) * trunc(Translate_Scale.translate.x / (input.width))"} {"-(input.height/Tile1.rows/Controls.scale) * trunc(Translate_Scale.translate.y / (input.height))"}}
+  center {{Input.width*2} {Input.height*2}}
+  filter Impulse
+  name Transform2
+  selected true
+  xpos 463
+  ypos 124
+ }
+ Transform {
+  translate {{-Input.width*Tile1.columns*((Tile1.columns-1)/2)} {-Input.height*Tile1.rows*((Tile1.rows-1)/2)}}
+  scale {{Tile1.columns} {Tile1.rows}}
+  filter Impulse
+  name Transform3
+  xpos 463
+  ypos 162
+ }
+ Transform {
+  scale {{1/Translate_Scale.scale}}
+  center {{Translate_Scale.center.x} {Translate_Scale.center.y}}
+  filter Impulse
+  name Transform4
+  xpos 463
+  ypos 208
+  disable true
+ }
+ Transform {
+  translate {{Controls.translate.x*(input.width/Input.width)} {Controls.translate.y*(input.height/Input.height)}}
+  filter Impulse
+  name Translate_Scale
+  xpos 463
+  ypos 243
+ }
+ Transform {
+  rotate {{Controls.rotate}}
+  scale {{Controls.scale}}
+  center {{input.width/2} {input.height/2}}
+  filter {{Controls.filter}}
+  motionblur {{Controls.motionblur}}
+  shutter {{Controls.shutter}}
+  shutteroffset {{Controls.shutteroffset}}
+  shuttercustomoffset {{Controls.shuttercustomoffset}}
+  name Transform6
+  xpos 463
+  ypos 278
+ }
+ Reformat {
+  type "to box"
+  box_width {{Input.width}}
+  box_height {{Input.height}}
+  box_fixed true
+  filter {{Controls.filter}}
+  name Reformat2
+  xpos 463
+  ypos 317
+ }
+ Output {
+  name Output1
+  xpos 463
+  ypos 355
+ }
+ Transform {
+  inputs 0
+  name Controls
+  xpos 286
+  ypos 284
+ }
+end_group

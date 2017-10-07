@@ -1,0 +1,170 @@
+#! /Applications/Nuke9.0v6.bak/Nuke9.0v6.app/Contents/MacOS//libnuke-9.0.6.dylib -nx
+version 9.0 v6
+Gizmo {
+ inputs 0
+ addUserKnob {20 User}
+ addUserKnob {41 format T Constant1.format}
+ addUserKnob {4 pjustify l justify M {center left right ""}}
+ addUserKnob {7 pangle l angle R 0 360}
+ pangle 36
+ addUserKnob {7 porientation l orientation R 0 360}
+}
+ Constant {
+  inputs 0
+  color {1 1 1 1}
+  name Constant1
+  label "\[python cget_format_data()]"
+  xpos 313
+  ypos -516
+ }
+set N1bfe1190 [stack 0]
+ Transform {
+  scale 3
+  center {{width/2} {height/2}}
+  name Transform4
+  xpos 215
+  ypos -371
+ }
+set N1bfe5070 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle1
+  xpos 115
+  ypos -371
+ }
+ Dot {
+  name Dot4
+  tile_color 0xff480000
+  note_font "Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic"
+  note_font_size 20
+  note_font_color 0xcccccccc
+  xpos 142
+  ypos -62
+  addUserKnob {20 User}
+  addUserKnob {22 createtx l "create TX knobs" -STARTLINE T "\n\nx=nuke.thisNode()\nif not x.knob('transform_tab') :\n    x.addKnob(nuke.Tab_Knob('transform_tab','Transform'))\n    x.addKnob(nuke.XY_Knob('translate','translate'))\n    x.addKnob(nuke.Double_Knob('rotate','rotate'))\n    x.addKnob(nuke.WH_Knob('scale','scale'))\n    x.addKnob(nuke.Double_Knob('skew','skew'))\n    x.addKnob(nuke.XY_Knob('center','center'))"}
+ }
+push $N1bfe5070
+ Dot {
+  name Dot3
+  tile_color 0xff480000
+  note_font "Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic"
+  note_font_size 20
+  note_font_color 0xcccccccc
+  xpos 242
+  ypos -129
+  addUserKnob {20 User}
+  addUserKnob {22 createtx l "create TX knobs" -STARTLINE T "\n\nx=nuke.thisNode()\nif not x.knob('transform_tab') :\n    x.addKnob(nuke.Tab_Knob('transform_tab','Transform'))\n    x.addKnob(nuke.XY_Knob('translate','translate'))\n    x.addKnob(nuke.Double_Knob('rotate','rotate'))\n    x.addKnob(nuke.WH_Knob('scale','scale'))\n    x.addKnob(nuke.Double_Knob('skew','skew'))\n    x.addKnob(nuke.XY_Knob('center','center'))"}
+ }
+push $N1bfe1190
+ Transform {
+  translate {{width/2} 0}
+  center {{width/2} {height/2}}
+  name Transform2
+  xpos 515
+  ypos -380
+ }
+ Dot {
+  name Dot1
+  tile_color 0xff480000
+  note_font "Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic Bold Italic"
+  note_font_size 20
+  note_font_color 0xcccccccc
+  xpos 542
+  ypos -113
+  addUserKnob {20 User}
+  addUserKnob {22 createtx l "create TX knobs" -STARTLINE T "\n\nx=nuke.thisNode()\nif not x.knob('transform_tab') :\n    x.addKnob(nuke.Tab_Knob('transform_tab','Transform'))\n    x.addKnob(nuke.XY_Knob('translate','translate'))\n    x.addKnob(nuke.Double_Knob('rotate','rotate'))\n    x.addKnob(nuke.WH_Knob('scale','scale'))\n    x.addKnob(nuke.Double_Knob('skew','skew'))\n    x.addKnob(nuke.XY_Knob('center','center'))"}
+ }
+push $N1bfe1190
+ Transform {
+  translate {0 {height/2}}
+  rotate {{(pangle/2)%180}}
+  scale 1.5
+  center {{width/2} 0}
+  name Transform1
+  selected true
+  xpos 313
+  ypos -287
+ }
+set N25ec4aa0 [stack 0]
+ Mirror {
+  Vertical true
+  name Mirror1
+  xpos 430
+  ypos -287
+ }
+set N25eca680 [stack 0]
+push $N25ec4aa0
+ Merge2 {
+  inputs 2
+  name Merge3
+  xpos 430
+  ypos -227
+ }
+push $N25eca680
+push $N25ec4aa0
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge1
+  xpos 313
+  ypos -227
+ }
+ Switch {
+  inputs 2
+  which {{(pangle%360)/2>90}}
+  name Switch1
+  xpos 313
+  ypos -171
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  name Merge2
+  xpos 313
+  ypos -110
+  disable {{pangle>90 x1 1}}
+ }
+ Switch {
+  inputs 3
+  which {{pangle==0?2:(pangle%360==0?1:0)}}
+  name Switch2
+  xpos 313
+  ypos -59
+ }
+ Transform {
+  rotate {{(-porientation-90)}}
+  center {{width/2} {height/2}}
+  name orient
+  xpos 313
+  ypos 18
+ }
+ Transform {
+  rotate {{pjustify==0?0:pjustify==1?-(pangle%360)/2:(pangle%360)/2}}
+  center {{width/2} {height/2}}
+  name Transform3
+  xpos 313
+  ypos 48
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  name Crop1
+  xpos 313
+  ypos 78
+ }
+ Output {
+  name Output1
+  xpos 313
+  ypos 145
+ }
+push $N25ec4aa0
+ Viewer {
+  frame_range 1-100
+  fps 25
+  name Viewer1
+  xpos 313
+  ypos -257
+ }
+end_group

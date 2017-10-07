@@ -1,0 +1,1224 @@
+Gizmo {
+ help "@b;RampColor v0.1@n; for Nuke 7 and above\n\nCreated by Vladislav Bakic\vladislav.bakic@gmail.com"
+ onCreate "def toggleRampCtrl(ramp):\n\tif not nuke.thisNode()\[ramp+'_percent'].getFlag(nuke.INVISIBLE):\n\t\tnuke.thisNode()\[ramp+'_percent'].setVisible(False)\n\t\tnuke.thisNode()\[ramp].setVisible(False)\n\t\tnuke.thisNode()\[ramp+'_percent'].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\[ramp].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisKnob().setLabel('<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">►</font></td></tr></table>')\n\telse:\n\t\tnuke.thisNode()\[ramp+'_percent'].setVisible(True)\n\t\tnuke.thisNode()\[ramp].setVisible(True)\n\t\tnuke.thisNode()\[ramp+'_percent'].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\[ramp].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisKnob().setLabel('<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>')\ndef copyKnob(inKnob, outKnob):\n\toutKnob.fromScript(inKnob.toScript())\n\ndef swapKnobs(knob1, knob2):\n\tval1 = knob1.toScript()\n\tval2 = knob2.toScript()\n\t\n\tknob1.clearAnimated()\n\tknob1.fromScript(val2)\n\n\tknob2.clearAnimated()\n\tknob2.fromScript(val1)\n\ndef swapRamps(node, index, dir):\n\tramps = \['p0']\n\tfor i in range(18):\n\t\tr = 'r'+str(i+1)\n\t\tif node\[r+'_color'].visible():\n\t\t\tramps.append(r)\n\tramps.append('p1')\n\tif index == 19:\n\t\tindex = len(ramps)-1\n\tattrs = \['_interpolation', '_enabled', '_color']\n\tif dir == 0:\n\t\tfor attr in attrs:\n\t\t\tswapKnobs(node\[ramps\[index]+attr], node\[ramps\[index+1]+attr])\n\telse:\n\t\tfor attr in attrs:\n\t\t\tswapKnobs(node\[ramps\[index]+attr], node\[ramps\[index-1]+attr])\n\t\t\t\ndef copyRamps(node, ramp1, ramp2):\n\tattrs = \['', '_percent', '_interpolation', '_enabled', '_color']\n\tfor attr in attrs:\n\t\tcopyKnob(node\[ramp1+attr], node\[ramp2+attr])\n\ndef addRamp(node, index):\n\tramps = \['p0']\n\tfor i in range(18):\n\t\tr = 'r'+str(i+1)\n\t\tif node\[r+'_color'].visible():\n\t\t\tramps.append(r)\n\tramps.append('p1')\n\tnumShown = len(ramps)\n\t\n\tattrs = \['', '_percent', '_interpolation', '_enabled', '_color', '_toggle', '_add', '_rem', '_down', '_up']\n\n\tnode\['r'+str(numShown-1)+'_toggle'].setLabel('<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>')\n\t\n\tfor attr in attrs:\n\t\tnode\['r'+str(numShown-1)+attr].setVisible(True)\n\t\tnode\['r'+str(numShown-1)+attr].clearFlag(nuke.INVISIBLE)\n\n\tramps.insert(-1, 'r'+str(numShown-1))\n\n\tfor i in range(index+1, len(ramps)-2):\n\t\tpos = len(ramps)-2-i+index\n\t\tcopyRamps(node, ramps\[pos], ramps\[pos+1])\n\t\n\tcolor = \[b*0.5+a*0.5 for a,b in zip(node\[ramps\[index]+'_color'].value(),node\[ramps\[index+2]+'_color'].value())]\n\tpercent = node\[ramps\[index]+'_percent'].value() + (node\[ramps\[index+2]+'_percent'].value()-node\[ramps\[index]+'_percent'].value())/2\n\tnode\[ramps\[index+1]+'_percent'].setValue(percent)\n\tnode\[ramps\[index+1]+'_color'].setValue(color)\n\tnode\[ramps\[index+1]+'_interpolation'].setValue(node\[ramps\[index]+'_interpolation'].value())\n\tnode\[ramps\[index+1]+'_enabled'].setValue(True)\n\ndef removeRamp(node, index):\n\tramps = \['p0']\n\tfor i in range(18):\n\t\tr = 'r'+str(i+1)\n\t\tif node\[r+'_color'].visible():\n\t\t\tramps.append(r)\n\tramps.append('p1')\n\tnumShown = len(ramps)\n\t\n\tattrs = \['', '_percent', '_interpolation', '_enabled', '_color', '_toggle', '_add', '_rem', '_down', '_up']\n\n\tfor attr in attrs:\n\t\tnode\['r'+str(numShown-2)+attr].setVisible(False)\n\t\tnode\['r'+str(numShown-2)+attr].setFlag(nuke.INVISIBLE)\n\n\tfor i in range(index+1, len(ramps)-1):\n\t\tpos = i\n\t\tcopyRamps(node, ramps\[pos], ramps\[pos-1])\n\t#disable\n\tnode\['r'+str(numShown-2)+'_enabled'].setValue(False)\nif not nuke.thisNode()\['created'].value():\n\tnuke.thisNode()\['p0'].setValue(\[0, nuke.root()\['format'].value().height()/2])\n\tnuke.thisNode()\['p1'].setValue(\[nuke.root()\['format'].value().width(), nuke.root()\['format'].value().height()/2])\n\tnuke.thisNode()\['created'].setValue(True)"
+ knobChanged "def positionCallback(group):\n\tp0 = \[group\['p0'].x(), group\['p0'].y()]\n\tp1 = \[group\['p1'].x(), group\['p1'].y()]\n\tgroup.node('Controls')\['p0'].setValue(p0)\n\tgroup.node('Controls')\['p1'].setValue(p1)\n\tfor knob in group.knobs():\n\t\tif knob.endswith('_percent'):\n\t\t\tif group\['relative'].value():\n\t\t\t\tname = knob.split('_')\[0]\n\t\t\t\tpercent = group\[knob].value()\n\t\t\t\tr = \[group\[name].x(), group\[name].y()]\t\n\t\t\t\tpercentPoint = \[(p1\[0]-p0\[0]) * percent + p0\[0], (p1\[1]-p0\[1]) * percent + p0\[1]]\n\t\t\t\tgroup\[name].setValue(percentPoint)\n\t\t\telse:\n\t\t\t\tcolorCallback(group, group\[knob])\ndef colorCallback(group, knob):\n\timport math\n\tid = knob.name().split('_')\[0]\n\t\n\tp0 = \[group\['p0'].x(), group\['p0'].y()]\n\tp1 = \[group\['p1'].x(), group\['p1'].y()]\n\tr = \[group\[id].x(), group\[id].y()]\n\t\n\tx1 = p1\[0] - p0\[0]\n\ty1 = p1\[1] - p0\[1]\n\t\n\tx2 = r\[0] - p0\[0]\n\ty2 = r\[1] - p0\[1]\n\t\n\tt = (x2*x1 + y2 * y1) / (x1 * x1 + y1 * y1)\n\t\n\tclosestPoint = \[p0\[0] + t * x1, p0\[1] + t * y1]\n\t\n\tgroup\[id].setValue(closestPoint)\n\t\n\tvec1 = math.sqrt(pow(closestPoint\[0]-p0\[0],2) + pow(closestPoint\[1]-p0\[1],2))\n\tvec2 = math.sqrt(pow(p1\[0]-p0\[0],2) + pow(p1\[1]-p0\[1],2))\n\t\n\tpercent = vec1/vec2\n\tgroup\[id+'_percent'].setValue(percent)\n\ndef drawRamp(group):\n\tsortedKnobs = \{\}\n\tfor knob, value in group.knobs().iteritems():\n\t\tif '_percent' in knob:\n\t\t\tname = knob.replace('_percent', '')\n\t\t\tif group\[name+'_enabled'].value():\n\t\t\t\tpos = value.value()\n\t\t\t\tinterpolation = group\[name+'_interpolation'].value()\n\t\t\t\tsortedKnobs\[name] = \{'pos':pos, 'interpolation':interpolation\}\n\t\n\tpoints = sorted(sortedKnobs.items(), key=lambda x: x\[1]\['pos'] )\n\t\n\tt = '(x-\{0\})/((\{1\}-\{0\})/2)'\n\tnone = '(x-\{0\}) < (\{1\}-\{0\}) ? 0 : 1'\n\tnone2 = '(x-\{0\}) < (\{1\}-\{0\})/2 ? 0 : 1'\n\tlinear = '(x-\{0\})/(\{1\}-\{0\})'\n\tquadratic = '\{0\} < 1 ? (1/2*\{0\}*\{0\})+0 : (-1/2 * ((\{0\}-1)*((\{0\}-1)-2) -1))'\n\tcubic = '\{0\} < 1 ? 1/2*\{0\}*\{0\}*\{0\}+0 : 1/2*((\{0\}-2)*(\{0\}-2)*(\{0\}-2)+2)'\n\tbase = 'x >= \{0\} && x< \{1\} ? (1-(\{5\}))*\{2\}_color.\{4\} + (\{5\})*parent.\{3\}_color.\{4\} : '\n\n\tfor ch in \['r','g','b','a']:\n\t\tresult = ''\n\t\tfor i in range(len(points)):\n\t\t\tif i < len(points)-1:\n\t\t\t\tp0 = '('+points\[i]\[0]+'_percent*width)'\n\t\t\t\tp1 = '('+points\[i+1]\[0]+'_percent*width)'\n\t\t\t\tt1 = t.format(p0, p1)\n\t\t\t\ttype = points\[i]\[1]\['interpolation']\n\t\t\t\tif type == 'linear':\n\t\t\t\t\teq = linear.format(p0, p1)\n\t\t\t\telif type == 'quadratic':\n\t\t\t\t\teq = quadratic.format(t1.format(p0, p1))\n\t\t\t\telif type == 'cubic':\n\t\t\t\t\teq = cubic.format(t1.format(p0, p1))\n\t\t\t\telif type == 'none':\n\t\t\t\t\teq = none.format(p0, p1)\n\t\t\t\telif type == 'none2':\n\t\t\t\t\teq = none2.format(p0, p1)\n\t\t\t\tresult += base.format(p0, p1, points\[i]\[0], points\[i+1]\[0], ch, eq)\n\t\tresult += '0'\n\t\tif ch == 'r':\n\t\t\tgroup.node('color')\['expr0'].setValue(result)\n\t\telif ch == 'g':\n\t\t\tgroup.node('color')\['expr1'].setValue(result)\n\t\telif ch == 'b':\n\t\t\tgroup.node('color')\['expr2'].setValue(result)\n\t\telif ch == 'a':\n\t\t   group.node('color')\['expr3'].setValue(result)\n\nif nuke.thisKnob().name()=='p0' or nuke.thisKnob().name()=='p1' or nuke.thisKnob().name().endswith('_percent'):\n\tpositionCallback(nuke.thisGroup())\n\t\nif nuke.thisKnob().name().replace('r','').isdigit():\n\tcolorCallback(nuke.thisNode(), nuke.thisKnob())\n\tdrawRamp(nuke.thisNode())\n\t\nif(nuke.thisKnob().name().endswith('interpolation')) or nuke.thisKnob().name().endswith('percent') or nuke.thisKnob().name().endswith('enabled'):\n\tdrawRamp(nuke.thisNode())\nif nuke.thisKnob().name() == 'displace':\n\tif nuke.thisKnob().value() == 'noise':\n\t\tnuke.thisNode()\['frequency'].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['uwaves'].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['vwaves'].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['vwaves'].setLabel('u waves')\n\telif nuke.thisKnob().value() == 'wave':\n\t\tnuke.thisNode()\['uwaves'].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['vwaves'].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['frequency'].setFlag(nuke.INVISIBLE)\n\telif nuke.thisKnob().value() == 'radial wave' or nuke.thisKnob().value() == 'circular wave':\n\t\tnuke.thisNode()\['uwaves'].clearFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['vwaves'].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['frequency'].setFlag(nuke.INVISIBLE)\n\t\tnuke.thisNode()\['vwaves'].setLabel('waves')"
+ addUserKnob {20 ramp l Ramp}
+ addUserKnob {4 rtype l type t "ramp type" M {uRamp vRamp symmetrical square circular radial "" "" "" "" "" ""}}
+ addUserKnob {14 scale t "Scales the ramp result regardless of the markers position. Could be useful when wanting to adjust the height of the uRamp to extend beyond the bounding box" R 0 100}
+ scale 1
+ addUserKnob {7 offset t "Moves the ramp in u direction, with the wrap around effect. Can be used to animate wave displacement for example."}
+ addUserKnob {41 columns l repeat t "makes the ramp tile in u direction" T Tile1.columns}
+ addUserKnob {41 mirrorCols l mirror t "mirrors the repeated ramp" -STARTLINE T Tile1.mirrorCols}
+ addUserKnob {6 mask t "Masks the bounding box, meaning it will not affect the displacement effects for example." -STARTLINE}
+ addUserKnob {6 blackoutside l "black outside" t "Clips the ramp area to the bounding box, it will affect the displacement." -STARTLINE}
+ addUserKnob {4 displace t "Gives a few displacement types for the ramp.\n• noise creates a random noise \n• wave creates waves in x and y space of the format, not the u and v space \n• radial wave creates radial waves, extending from the first ramp position. \n• circular wave these waves have a ripple like effect, starting from the first ramp position." M {noise wave "radial wave" "circular wave" "" "" "" ""}}
+ addUserKnob {6 displace_relative l "relative scale" t "scales the noise with the ramp" -STARTLINE}
+ displace_relative true
+ addUserKnob {41 uv_scale l magnitude T IDistort1.uv_scale}
+ addUserKnob {7 frequency t "noise frequency" R 0 100}
+ frequency 10
+ addUserKnob {7 uwaves l uwaves t "number of waves in u direction" +INVISIBLE R 0 10}
+ uwaves 10
+ addUserKnob {7 vwaves l vwaves t "number of waves in v direction" -STARTLINE +INVISIBLE R 0 10}
+ addUserKnob {41 filter T Remap.filter}
+ addUserKnob {4 output t "Choose between ouputing the ramp on top of the input or a remapped input image. Remapping takes into account the postion of the ramp, so make sure it extends from 0 to 100 percent of the format width for best results." M {ramp remapped ""}}
+ addUserKnob {41 format l "output format" T OutputFormat.format}
+ addUserKnob {26 ""}
+ addUserKnob {6 relative l "relative positioning" t "Scales the position of the ramps when moving the first and the last ramp" -STARTLINE}
+ relative true
+ addUserKnob {19 p0_color l p0}
+ p0_color {0 0 0 1}
+ addUserKnob {6 p0_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 p0_interpolation l "" -STARTLINE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 p0_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE T toggleRampCtrl('p0')}
+ addUserKnob {22 p0_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE T "addRamp(nuke.thisNode(), 0)"}
+ addUserKnob {22 p0_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#666666\">-</font></td></tr></table>" -STARTLINE +DISABLED}
+ addUserKnob {22 p0_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE T "swapRamps(nuke.thisNode(), 0, 0)"}
+ addUserKnob {22 p0_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#666666\">▲</font></td></tr></table>" -STARTLINE +DISABLED}
+ addUserKnob {6 p0_enabled l "" -STARTLINE}
+ p0_enabled true
+ addUserKnob {12 p0 l position}
+ p0 {0 240}
+ addUserKnob {7 p0_percent l percent -STARTLINE +DISABLED}
+ addUserKnob {19 r1_color l r1 +HIDDEN +INVISIBLE}
+ r1_color {1 1 1 0}
+ addUserKnob {6 r1_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r1_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r1_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r1')}
+ addUserKnob {22 r1_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 1)"}
+ addUserKnob {22 r1_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 1)"}
+ addUserKnob {22 r1_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 1, 0)"}
+ addUserKnob {22 r1_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 1, 1)"}
+ addUserKnob {6 r1_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r1 l position +INVISIBLE}
+ r1 {168.1556468 240}
+ addUserKnob {7 r1_percent l percent -STARTLINE +INVISIBLE}
+ r1_percent 0.2627431981
+ addUserKnob {19 r2_color l r2 +HIDDEN +INVISIBLE}
+ r2_color {0 0 0 1}
+ addUserKnob {6 r2_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r2_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r2_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r2')}
+ addUserKnob {22 r2_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 2)"}
+ addUserKnob {22 r2_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 2)"}
+ addUserKnob {22 r2_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 2, 0)"}
+ addUserKnob {22 r2_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 2, 1)"}
+ addUserKnob {6 r2_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r2 l position +INVISIBLE}
+ r2 {3065.186809 240}
+ addUserKnob {7 r2_percent l percent -STARTLINE +INVISIBLE}
+ r2_percent 4.789354389
+ addUserKnob {19 r3_color l r3 +HIDDEN +INVISIBLE}
+ r3_color {0 0 0 1}
+ addUserKnob {6 r3_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r3_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r3_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r3')}
+ addUserKnob {22 r3_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 3)"}
+ addUserKnob {22 r3_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 3)"}
+ addUserKnob {22 r3_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 3, 0)"}
+ addUserKnob {22 r3_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 3, 1)"}
+ addUserKnob {6 r3_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r3 l position +INVISIBLE}
+ r3 {2412.438838 240}
+ addUserKnob {7 r3_percent l percent -STARTLINE +INVISIBLE}
+ r3_percent 3.769435684
+ addUserKnob {19 r4_color l r4 +HIDDEN +INVISIBLE}
+ r4_color {0 0 0 1}
+ addUserKnob {6 r4_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r4_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r4_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r4')}
+ addUserKnob {22 r4_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 4)"}
+ addUserKnob {22 r4_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 4)"}
+ addUserKnob {22 r4_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 4, 0)"}
+ addUserKnob {22 r4_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 4, 1)"}
+ addUserKnob {6 r4_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r4 l position +INVISIBLE}
+ r4 {2412.438838 240}
+ addUserKnob {7 r4_percent l percent -STARTLINE +INVISIBLE}
+ r4_percent 3.769435684
+ addUserKnob {19 r5_color l r5 +HIDDEN +INVISIBLE}
+ r5_color {0 0 0 1}
+ addUserKnob {6 r5_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r5_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r5_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r5')}
+ addUserKnob {22 r5_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 5)"}
+ addUserKnob {22 r5_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 5)"}
+ addUserKnob {22 r5_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 5, 0)"}
+ addUserKnob {22 r5_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 5, 1)"}
+ addUserKnob {6 r5_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r5 l position +INVISIBLE}
+ r5 {3065.186809 240}
+ addUserKnob {7 r5_percent l percent -STARTLINE +INVISIBLE}
+ r5_percent 4.789354389
+ addUserKnob {19 r6_color l r6 +HIDDEN +INVISIBLE}
+ r6_color {0 0 0 1}
+ addUserKnob {6 r6_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r6_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r6_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r6')}
+ addUserKnob {22 r6_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 6)"}
+ addUserKnob {22 r6_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 6)"}
+ addUserKnob {22 r6_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 6, 0)"}
+ addUserKnob {22 r6_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 6, 1)"}
+ addUserKnob {6 r6_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r6 l position +INVISIBLE}
+ r6 {3065.186809 240}
+ addUserKnob {7 r6_percent l percent -STARTLINE +INVISIBLE}
+ r6_percent 4.789354389
+ addUserKnob {19 r7_color l r7 +HIDDEN +INVISIBLE}
+ r7_color {0 0 0 1}
+ addUserKnob {6 r7_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r7_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r7_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r7')}
+ addUserKnob {22 r7_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 7)"}
+ addUserKnob {22 r7_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 7)"}
+ addUserKnob {22 r7_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 7, 0)"}
+ addUserKnob {22 r7_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 7, 1)"}
+ addUserKnob {6 r7_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r7 l position +INVISIBLE}
+ r7 {3065.186809 240}
+ addUserKnob {7 r7_percent l percent -STARTLINE +INVISIBLE}
+ r7_percent 4.789354389
+ addUserKnob {19 r8_color l r8 +HIDDEN +INVISIBLE}
+ r8_color {0 0 0 1}
+ addUserKnob {6 r8_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r8_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r8_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r8')}
+ addUserKnob {22 r8_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 8)"}
+ addUserKnob {22 r8_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 8)"}
+ addUserKnob {22 r8_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 8, 0)"}
+ addUserKnob {22 r8_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 8, 1)"}
+ addUserKnob {6 r8_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r8 l position +INVISIBLE}
+ r8 {3065.186809 240}
+ addUserKnob {7 r8_percent l percent -STARTLINE +INVISIBLE}
+ r8_percent 4.789354389
+ addUserKnob {19 r9_color l r9 +HIDDEN +INVISIBLE}
+ r9_color {0 0 0 1}
+ addUserKnob {6 r9_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r9_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r9_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r9')}
+ addUserKnob {22 r9_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 9)"}
+ addUserKnob {22 r9_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 9)"}
+ addUserKnob {22 r9_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 9, 0)"}
+ addUserKnob {22 r9_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 9, 1)"}
+ addUserKnob {6 r9_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r9 l position +INVISIBLE}
+ r9 {3065.186809 240}
+ addUserKnob {7 r9_percent l percent -STARTLINE +INVISIBLE}
+ r9_percent 4.789354389
+ addUserKnob {19 r10_color l r10 +HIDDEN +INVISIBLE}
+ r10_color {0 0 0 1}
+ addUserKnob {6 r10_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r10_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r10_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r10')}
+ addUserKnob {22 r10_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 10)"}
+ addUserKnob {22 r10_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 10)"}
+ addUserKnob {22 r10_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 10, 0)"}
+ addUserKnob {22 r10_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 10, 1)"}
+ addUserKnob {6 r10_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r10 l position +INVISIBLE}
+ r10 {3065.186809 240}
+ addUserKnob {7 r10_percent l percent -STARTLINE +INVISIBLE}
+ r10_percent 4.789354389
+ addUserKnob {19 r11_color l r11 +HIDDEN +INVISIBLE}
+ r11_color {0 0 0 1}
+ addUserKnob {6 r11_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r11_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r11_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r11')}
+ addUserKnob {22 r11_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 11)"}
+ addUserKnob {22 r11_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 11)"}
+ addUserKnob {22 r11_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 11, 0)"}
+ addUserKnob {22 r11_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 11, 1)"}
+ addUserKnob {6 r11_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r11 l position +INVISIBLE}
+ r11 {3065.186809 240}
+ addUserKnob {7 r11_percent l percent -STARTLINE +INVISIBLE}
+ r11_percent 4.789354389
+ addUserKnob {19 r12_color l r12 +HIDDEN +INVISIBLE}
+ r12_color {0 0 0 1}
+ addUserKnob {6 r12_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r12_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r12_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r12')}
+ addUserKnob {22 r12_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 12)"}
+ addUserKnob {22 r12_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 12)"}
+ addUserKnob {22 r12_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 12, 0)"}
+ addUserKnob {22 r12_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 12, 1)"}
+ addUserKnob {6 r12_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r12 l position +INVISIBLE}
+ r12 {3065.186809 240}
+ addUserKnob {7 r12_percent l percent -STARTLINE +INVISIBLE}
+ r12_percent 4.789354389
+ addUserKnob {19 r13_color l r13 +HIDDEN +INVISIBLE}
+ r13_color {0 0 0 1}
+ addUserKnob {6 r13_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r13_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r13_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r13')}
+ addUserKnob {22 r13_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 13)"}
+ addUserKnob {22 r13_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 13)"}
+ addUserKnob {22 r13_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 13, 0)"}
+ addUserKnob {22 r13_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 13, 1)"}
+ addUserKnob {6 r13_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r13 l position +INVISIBLE}
+ r13 {3065.186809 240}
+ addUserKnob {7 r13_percent l percent -STARTLINE +INVISIBLE}
+ r13_percent 4.789354389
+ addUserKnob {19 r14_color l r14 +HIDDEN +INVISIBLE}
+ r14_color {0 0 0 1}
+ addUserKnob {6 r14_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r14_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r14_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r14')}
+ addUserKnob {22 r14_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 14)"}
+ addUserKnob {22 r14_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 14)"}
+ addUserKnob {22 r14_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 14, 0)"}
+ addUserKnob {22 r14_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 14, 1)"}
+ addUserKnob {6 r14_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r14 l position +INVISIBLE}
+ r14 {3065.186809 240}
+ addUserKnob {7 r14_percent l percent -STARTLINE +INVISIBLE}
+ r14_percent 4.789354389
+ addUserKnob {19 r15_color l r15 +HIDDEN +INVISIBLE}
+ r15_color {0 0 0 1}
+ addUserKnob {6 r15_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r15_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r15_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r15')}
+ addUserKnob {22 r15_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 15)"}
+ addUserKnob {22 r15_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 15)"}
+ addUserKnob {22 r15_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 15, 0)"}
+ addUserKnob {22 r15_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 15, 1)"}
+ addUserKnob {6 r15_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r15 l position +INVISIBLE}
+ r15 {3065.186809 240}
+ addUserKnob {7 r15_percent l percent -STARTLINE +INVISIBLE}
+ r15_percent 4.789354389
+ addUserKnob {19 r16_color l r16 +HIDDEN +INVISIBLE}
+ r16_color {0 0 0 1}
+ addUserKnob {6 r16_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r16_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r16_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r16')}
+ addUserKnob {22 r16_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 16)"}
+ addUserKnob {22 r16_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 16)"}
+ addUserKnob {22 r16_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 16, 0)"}
+ addUserKnob {22 r16_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 16, 1)"}
+ addUserKnob {6 r16_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r16 l position +INVISIBLE}
+ r16 {3065.186809 240}
+ addUserKnob {7 r16_percent l percent -STARTLINE +INVISIBLE}
+ r16_percent 4.789354389
+ addUserKnob {19 r17_color l r17 +HIDDEN +INVISIBLE}
+ r17_color {0 0 0 1}
+ addUserKnob {6 r17_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r17_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r17_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r17')}
+ addUserKnob {22 r17_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 17)"}
+ addUserKnob {22 r17_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 17)"}
+ addUserKnob {22 r17_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 17, 0)"}
+ addUserKnob {22 r17_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 17, 1)"}
+ addUserKnob {6 r17_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r17 l position +INVISIBLE}
+ r17 {3065.186809 240}
+ addUserKnob {7 r17_percent l percent -STARTLINE +INVISIBLE}
+ r17_percent 4.789354389
+ addUserKnob {19 r18_color l r18 +HIDDEN +INVISIBLE}
+ r18_color {0 0 0 1}
+ addUserKnob {6 r18_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 r18_interpolation l "" -STARTLINE +INVISIBLE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 r18_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T toggleRampCtrl('r18')}
+ addUserKnob {22 r18_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">+</font></td></tr></table>" -STARTLINE +INVISIBLE T "addRamp(nuke.thisNode(), 18)"}
+ addUserKnob {22 r18_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">-</font></td></tr></table>" -STARTLINE +INVISIBLE T "removeRamp(nuke.thisNode(), 18)"}
+ addUserKnob {22 r18_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▼</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 18, 0)"}
+ addUserKnob {22 r18_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE +INVISIBLE T "swapRamps(nuke.thisNode(), 18, 1)"}
+ addUserKnob {6 r18_enabled l "" -STARTLINE +INVISIBLE}
+ addUserKnob {12 r18 l position +INVISIBLE}
+ r18 {3065.186809 240}
+ addUserKnob {7 r18_percent l percent -STARTLINE +INVISIBLE}
+ r18_percent 4.789354389
+ addUserKnob {19 p1_color l p1}
+ p1_color {1 1 1 1}
+ addUserKnob {6 p1_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 p1_interpolation l "" -STARTLINE M {linear quadratic cubic none none2 ""}}
+ addUserKnob {22 p1_toggle l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#ffff00\">▼</font></td></tr></table>" -STARTLINE T toggleRampCtrl('p1')}
+ addUserKnob {22 p1_add l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#666666\">+</font></td></tr></table>" -STARTLINE +DISABLED}
+ addUserKnob {22 p1_rem l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#666666\">-</font></td></tr></table>" -STARTLINE +DISABLED}
+ addUserKnob {22 p1_down l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\" color=\"#666666\">▼</font></td></tr></table>" -STARTLINE +DISABLED}
+ addUserKnob {22 p1_up l "<table height=\"8\" width=\"8\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td valign=\"middle\" align=\"center\"><font size=\"1\">▲</font></td></tr></table>" -STARTLINE T "swapRamps(nuke.thisNode(), 19, 1)"}
+ addUserKnob {6 p1_enabled l "" -STARTLINE}
+ p1_enabled true
+ addUserKnob {12 p1 l position}
+ p1 {640 240}
+ addUserKnob {7 p1_percent l percent -STARTLINE +DISABLED}
+ p1_percent 1
+ addUserKnob {41 rp0 l INVISIBLE +INVISIBLE T Controls.p0}
+ addUserKnob {41 rp1 l INVISIBLE -STARTLINE +INVISIBLE T Controls.p1}
+ addUserKnob {3 created l INVISIBLE +INVISIBLE}
+ addUserKnob {26 author l "" +STARTLINE T "<a style=\"color:#444;font-size:9px;text-decoration:none;\" href=\"http://www.vladislavbakic.com\">vladislavbakic.com</a>"}
+}
+ BackdropNode {
+  inputs 0
+  name RampType
+  tile_color 0x9fffff
+  note_font_color 0xff
+  xpos 538
+  ypos -714
+  bdwidth 380
+  bdheight 246
+ }
+ BackdropNode {
+  inputs 0
+  name Displace
+  tile_color 0xff55d4ff
+  xpos 537
+  ypos -453
+  bdwidth 383
+  bdheight 242
+ }
+ BackdropNode {
+  inputs 0
+  name Color
+  tile_color 0xdfff00ff
+  note_font_color 0xff
+  xpos 334
+  ypos -715
+  bdwidth 153
+  bdheight 84
+ }
+ BackdropNode {
+  inputs 0
+  name Mask
+  tile_color 0x1fff00ff
+  xpos 534
+  ypos -198
+  bdwidth 387
+  bdheight 187
+ }
+ BackdropNode {
+  inputs 0
+  name Transformations
+  xpos 331
+  ypos -490
+  bdwidth 163
+  bdheight 157
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 97
+  ypos -827
+ }
+ Dot {
+  name Dot10
+  xpos 131
+  ypos -161
+ }
+set N6b0bfeb0 [stack 0]
+ Dot {
+  name Dot11
+  xpos 253
+  ypos -161
+ }
+ Roto {
+  inputs 0
+  output alpha
+  cliptype bbox
+  curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 512}
+    {t x447a8000 x44700000}
+    {a}
+    {curvegroup Ellipse1 512 bezier
+     {{cc
+       {f 8192}
+       {p
+        {xc40d46cb}
+        {x3dcd10e4 xc47ff42c}
+        {x440d46c7}
+        {0 xc40d46c8}
+        {x447fd435 xbf199800}
+        {0 x440d46c7}
+        {x440d46c7}
+        {x3dcd10e4 x447fa756}
+        {xc40d46cb}
+        {0 x440d46c7}
+        {xc47fc755 xbf199800}
+        {0 xc40d46c8}}}
+      {cc
+       {f 8192}
+       {p
+        {xc40d46cb}
+        {}
+        {x440d46c7}
+        {0 xc40d46c8}
+        {}
+        {0 x440d46c7}
+        {x440d46c7}
+        {}
+        {xc40d46cb}
+        {0 x440d46c7}
+        {}
+        {0 xc40d46c8}}}}
+     {t 0 0
+      {{x41d00000 0}}
+      {=Controls.p0.x
+       {{0 0}}}
+      {=Controls.p0.y
+       {{0 0}}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+       {{0 1}}}
+      {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+       {{0 1}}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}}
+     {a str 1 spx x44800000 spy x44428000 sb 1 ltn x41d00000 ltm x41d00000 tt x41000000}}}}}}
+  toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { selectCurves str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createOpenSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 tt 8 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+  toolbar_source_transform_scale {1 1}
+  toolbar_source_transform_center {1024 778}
+  colorOverlay {0 0 0 0}
+  lifetime_type "all frames"
+  lifetime_start 26
+  lifetime_end 26
+  motionblur_shutter_offset_type centred
+  source_black_outside true
+  createNewTrack {{-1} "-1\t(none)\t-1" "1000\tNew Track Layer\t1000"}
+  name Circle
+  xpos 742
+  ypos -161
+ }
+ Roto {
+  inputs 0
+  output alpha
+  cliptype bbox
+  curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 512}
+    {t x447a8000 x44700000}
+    {a}
+    {curvegroup Square 512 bezier
+     {{cc
+       {f 8192}
+       {px x41d00000
+        {0 0}
+        {x3dcd10e4 xc47ff42c}
+        {0 0}
+        {0 0}
+        {x447fd435 xbf199800}
+        {0 0}
+        {0 0}
+        {x3dcd10e4 x447fa756}
+        {0 0}
+        {0 0}
+        {xc47fc755 xbf199800}
+        {0 0}}}     idem}
+     {t 0 0
+      {{x41d00000 0}}
+      {=Controls.p0.x
+       {{0 0}}}
+      {=Controls.p0.y 0}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {=Rotation.rotate x41a00000}
+      {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+       {{0 1}}}
+      {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+       {{0 1}}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 0}}
+      {{x41d00000 1}}}
+     {a str 1 spx x44800000 spy x44428000 sb 1 ltn x41d00000 ltm x41d00000 tt x41000000}}}}}}
+  toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { selectCurves str 1 ssx 1 ssy 1 sf 1 }
+  { selectPoints str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createOpenSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 tt 8 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { cuspPoints str 1 ssx 1 ssy 1 sf 1 }
+  { curvePoints str 1 ssx 1 ssy 1 sf 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+  toolbar_label_points true
+  toolbar_show_clone_settings true
+  toolbar_source_transform_scale {1 1}
+  toolbar_source_transform_center {1024 778}
+  colorOverlay {0 0 0 0}
+  lifetime_type "all frames"
+  lifetime_start 26
+  lifetime_end 26
+  motionblur_shutter_offset_type centred
+  source_black_outside true
+  createNewTrack {{-1} "-1\t(none)\t-1" "1000\tNew Track Layer\t1000"}
+  name Diamond
+  xpos 740
+  ypos -114
+ }
+ Roto {
+  inputs 0
+  output alpha
+  curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 512}
+    {t x44800000 x44428000}
+    {a}
+    {curvegroup Shape1 512 bezier
+     {{cc
+       {f 8192}
+       {p
+        {}
+        {xc4800000 xc4800000}
+        {}
+        {}
+        {xc4800000 x44800000}
+        {}
+        {}
+        {x44800000 x44800000}
+        {}
+        {}
+        {x44800000 xc4800000}
+        {}}}
+      {cc
+       {f 8192}
+       {p
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}}}}
+     {t
+   {{x41800000 0}}
+   {{x41800000 0}}  0
+   {=Controls.p0.x
+    {{x41800000 0 -}}}
+   {=Controls.p0.y
+    {{x41800000 0 -}}}  0 0 0
+   {=Rotation.rotate
+    {{x41800000 0 -}}}
+   {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+    {{x41800000 1 -}}}
+   {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+    {{x41800000 1 -}}}  1
+   {{x41800000 0}}  0 0 0 0 0 0
+   {{x41800000 1}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 1}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 1}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 0}}
+   {{x41800000 1}}}
+     {a str 1 spx x44800000 spy x44428000 sb 1 ltn x41800000 ltm x41800000 tt x40800000 str 1 spx x44800000 spy x44428000 sb 1 ltn x41800000 ltm x41800000 tt x40800000 str 1 spx x44800000 spy x44428000 sb 1 ltn x41800000 ltm x41800000 tt x40800000 str 1 ss 0 spx x44800000 spy x44428000 sb 1 ltn x41800000 ltm x41800000 tt x40800000}}}}}}
+  toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createOpenSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+  toolbar_source_transform_scale {1 1}
+  toolbar_source_transform_center {1024 778}
+  colorOverlay {0 0 0 0}
+  lifetime_type "all frames"
+  lifetime_start 16
+  lifetime_end 16
+  motionblur_shutter_offset_type centred
+  source_black_outside true
+  createNewTrack {{-1} "-1\t(none)\t-1" "1000\tNew Track Layer\t1000"}
+  name Mirror
+  xpos 739
+  ypos -75
+ }
+ Roto {
+  inputs 0
+  output alpha
+  curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 512}
+    {t x44800000 x44428000}
+    {a}
+    {curvegroup Shape1 512 bezier
+     {{cc
+       {f 8192}
+       {p
+        {}
+        {0 xc4000000}
+        {}
+        {}
+        {0 x44000000}
+        {}
+        {}
+        {x44800000 x44000000}
+        {}
+        {}
+        {x44800000 xc4000000}
+        {}}}
+      {cc
+       {f 8192}
+       {p
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}
+        {}}}}
+     {t 0 0       0
+   {=Controls.p0.x
+    {{x40800000 0 -}}}
+   {=Controls.p0.y
+    {{x40800000 0 -}}}  0 0 0
+   {=Rotation.rotate
+    {{x40800000 0 -}}}
+   {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+    {{x40800000 1 -}}}
+   {"=sqrt((Controls.p1.x-Controls.p0.x)*(Controls.p1.x-Controls.p0.x)\ +\ (Controls.p1.y-Controls.p0.y)*(Controls.p1.y-Controls.p0.y))/1024"
+    {{x40800000 1 -}}}  1
+   {{x40800000 0}}  0 0 0 0 0 0
+   {{x40800000 1}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 1}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 1}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 0}}
+   {{x40800000 1}}}
+     {a str 1 spx x44800000 spy x44428000 sb 1 ltn x40800000 ltm x40800000 tt x40800000 str 1 spx x44800000 spy x44428000 sb 1 ltn x40800000 ltm x40800000 tt x40800000 str 1 spx x44800000 spy x44428000 sb 1 ltn x40800000 ltm x40800000 tt x40800000 str 1 ss 0 spx x44800000 spy x44428000 sb 1 ltn x40800000 ltm x40800000 tt x40800000}}}}}}
+  toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createOpenSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+  toolbar_source_transform_scale {1 1}
+  toolbar_source_transform_center {1024 778}
+  colorOverlay {0 0 0 0}
+  lifetime_type "all frames"
+  lifetime_start 4
+  lifetime_end 4
+  motionblur_shutter_offset_type centred
+  source_black_outside true
+  createNewTrack {{-1} "-1\t(none)\t-1" "1000\tNew Track Layer\t1000"}
+  name Square
+  xpos 740
+  ypos -39
+ }
+set N6b2e4530 [stack 0]
+push $N6b2e4530
+ Switch {
+  inputs 5
+  which {{parent.rtype}}
+  name Switch1
+  xpos 574
+  ypos -108
+ }
+ Dot {
+  name Dot6
+  xpos 479
+  ypos -105
+ }
+set N6b2e48a0 [stack 0]
+push $N6b2e48a0
+ Reformat {
+  inputs 0
+  type "to box"
+  box_width {{"sqrt(pow(Controls.p1.x-Controls.p0.x,2)+ pow(Controls.p1.y-Controls.p0.y,2))*2 > 0.99 ? sqrt(pow(Controls.p1.x-Controls.p0.x,2)+ pow(Controls.p1.y-Controls.p0.y,2))*2 : 1"}}
+  box_height {{"sqrt(pow(Controls.p1.x-Controls.p0.x,2)+ pow(Controls.p1.y-Controls.p0.y,2))*2 > 0.99 ? sqrt(pow(Controls.p1.x-Controls.p0.x,2)+ pow(Controls.p1.y-Controls.p0.y,2))*2 : 1"}}
+  box_fixed true
+  name RampFormat
+  xpos 367
+  ypos -781
+ }
+set N6b2e4c10 [stack 0]
+ Dot {
+  name Dot15
+  xpos 859
+  ypos -778
+ }
+ Dot {
+  name Dot5
+  xpos 859
+  ypos -677
+ }
+set N6b2e52f0 [stack 0]
+ Dot {
+  name Dot13
+  xpos 859
+  ypos -641
+ }
+set N6b2e5660 [stack 0]
+ Dot {
+  name Dot4
+  xpos 859
+  ypos -610
+ }
+set N6b2e59d0 [stack 0]
+ Dot {
+  name Dot3
+  xpos 859
+  ypos -569
+ }
+set N6b2e5d40 [stack 0]
+ Dot {
+  name Dot2
+  xpos 859
+  ypos -529
+ }
+set N6b190920 [stack 0]
+ Dot {
+  name Dot1
+  xpos 859
+  ypos -490
+ }
+ Expression {
+  expr0 "atan2(((height/2)-y%height)/height, ((width/2)-x%width)/width)*(180/pi/360)+0.5"
+  channel1 {-rgba.red -rgba.green -rgba.blue none}
+  name radial1
+  xpos 738
+  ypos -493
+ }
+push $N6b190920
+ Expression {
+  expr0 "sqrt(pow(width/2.0-x%width, 2) + pow(height/2.0-y%height, 2))/sqrt(pow(width/2, 2) + pow(height/2, 2))/0.7071067811865475"
+  name circular
+  xpos 738
+  ypos -532
+ }
+push $N6b2e5d40
+ Expression {
+  expr0 "(abs((width/2)-x%width)/width*2 + abs((height/2)-y%height)/height*2)"
+  channel1 {-rgba.red -rgba.green -rgba.blue none}
+  name box
+  xpos 739
+  ypos -572
+ }
+push $N6b2e59d0
+ Expression {
+  expr0 abs(((width-0.5)/2)-x%width)/width*2
+  channel1 {-rgba.red -rgba.green -rgba.blue none}
+  name symmetrical
+  xpos 740
+  ypos -613
+ }
+push $N6b2e5660
+ Expression {
+  temp_name0 t
+  temp_expr0 x/(width/2)
+  temp_name1 li
+  temp_expr1 (x/width)
+  temp_name2 q
+  temp_expr2 "t < 1 ? (1/2*t*t)+0 : (-1/2 * ((t-1)*((t-1)-2) -1))+0"
+  temp_name3 c
+  temp_expr3 "t < 1 ? 1/2*t*t*t+0 : 1/2*((t-2)*(t-2)*(t-2)+2)+0"
+  expr0 y/height
+  expr1 q
+  expr2 c
+  name v
+  xpos 738
+  ypos -644
+ }
+ Transform {
+  translate {{RampFormat.width/2} {RampFormat.width/4}}
+  scale 0.5
+  black_outside false
+  name Transform1
+  xpos 639
+  ypos -644
+ }
+push $N6b2e52f0
+ Expression {
+  temp_name0 t
+  temp_expr0 x/(width/2)
+  temp_name1 li
+  temp_expr1 (x/width)
+  temp_name2 q
+  temp_expr2 "t < 1 ? (1/2*t*t)+0 : (-1/2 * ((t-1)*((t-1)-2) -1))+0"
+  temp_name3 c
+  temp_expr3 "t < 1 ? 1/2*t*t*t+0 : 1/2*((t-2)*(t-2)*(t-2)+2)+0"
+  expr0 x/width
+  name u
+  xpos 738
+  ypos -680
+ }
+ Transform {
+  translate {{RampFormat.width/2} {RampFormat.width/4}}
+  scale 0.5
+  black_outside false
+  name Transform2
+  xpos 640
+  ypos -680
+ }
+ Switch {
+  inputs 6
+  which {{parent.rtype}}
+  name TypeChooser
+  xpos 559
+  ypos -600
+ }
+push $N6b2e4c10
+ Expression {
+  temp_name0 wave
+  temp_expr0 (sin(y/50)/2+0.5)*200
+  expr0 "x >= (p0_percent*width) && x< (p1_percent*width) ? (1-((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width))))*p0_color.r + ((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width)))*parent.p1_color.r : 0"
+  expr1 "x >= (p0_percent*width) && x< (p1_percent*width) ? (1-((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width))))*p0_color.g + ((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width)))*parent.p1_color.g : 0"
+  expr2 "x >= (p0_percent*width) && x< (p1_percent*width) ? (1-((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width))))*p0_color.b + ((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width)))*parent.p1_color.b : 0"
+  expr3 "x >= (p0_percent*width) && x< (p1_percent*width) ? (1-((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width))))*p0_color.a + ((x-(p0_percent*width))/((p1_percent*width)-(p0_percent*width)))*parent.p1_color.a : 0"
+  name color
+  xpos 367
+  ypos -679
+ }
+ Crop {
+  box {0 0 {RampFormat.width} {RampFormat.height}}
+  crop false
+  name Crop1
+  xpos 188
+  ypos -679
+ }
+ Reformat {
+  type "to box"
+  box_width {{input.width*2}}
+  box_height {{input.height}}
+  box_fixed true
+  name Reformat1
+  xpos -105
+  ypos -679
+ }
+ Tile {
+  rows 0
+  columns 2
+  name Tile2
+  xpos -105
+  ypos -648
+ }
+ Transform {
+  translate {{parent.offset%1*width/2} 0}
+  center {4096 2048}
+  name Transform3
+  xpos -105
+  ypos -624
+ }
+ Crop {
+  box {{RampFormat.width} 0 {RampFormat.width*2} {RampFormat.height}}
+  reformat true
+  crop false
+  name Crop2
+  xpos -105
+  ypos -600
+ }
+ Tile {
+  rows {{columns}}
+  filter Impulse
+  name Tile1
+  xpos 189
+  ypos -600
+ }
+ STMap {
+  inputs 2
+  channels rgba
+  uv {rgba.red -rgba.green}
+  blur_scale 0
+  name Remap
+  xpos 369
+  ypos -600
+ }
+ Transform {
+  translate {{-RampFormat.width/2} {-RampFormat.height/2}}
+  black_outside false
+  name Position
+  xpos 369
+  ypos -454
+ }
+ Transform {
+  translate {{Controls.p0.x} {Controls.p0.y}}
+  rotate {{atan2(Controls.p1.y-Controls.p0.y,Controls.p1.x-Controls.p0.x)*(180/pi)}}
+  scale {{parent.scale} {parent.scale}}
+  black_outside {{parent.blackoutside}}
+  name Rotation
+  xpos 369
+  ypos -418
+ }
+ Reformat {
+  resize none
+  center false
+  filter {{Remap.filter}}
+  name OutputFormat
+  xpos 369
+  ypos -381
+ }
+ Dot {
+  name Dot8
+  xpos 403
+  ypos -295
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge4
+  xpos 445
+  ypos -298
+  disable {{!parent.blackoutside}}
+ }
+ Reformat {
+  inputs 0
+  format {{{OutputFormat.format}}}
+  resize none
+  center false
+  filter {{Remap.filter}}
+  name OutputFormat1
+  xpos 822
+  ypos -422
+ }
+ Dot {
+  name Dot7
+  xpos 856
+  ypos -377
+ }
+set N6b4e54b0 [stack 0]
+ Dot {
+  name Dot16
+  xpos 856
+  ypos -347
+ }
+set N6b4e5820 [stack 0]
+ Expression {
+  temp_name0 aspectx
+  temp_expr0 "displace_relative ? (width/RampFormat.width) : 1"
+  temp_name1 aspecty
+  temp_expr1 "displace_relative ? (height/RampFormat.height) : 1"
+  temp_name2 div
+  temp_expr2 (162.776/parent.uwaves)
+  expr0 "sin(hypot(x-Controls.p0.x, y-Controls.p0.y ) / div*aspectx)"
+  expr1 "sin(hypot(x-Controls.p0.x, y-Controls.p0.y ) / div*aspectx)"
+  name circularWave1
+  selected true
+  xpos 741
+  ypos -350
+ }
+push $N6b4e5820
+ Dot {
+  name Dot14
+  xpos 856
+  ypos -312
+ }
+set N6b55f1c0 [stack 0]
+ Expression {
+  expr0 "sin( (atan(x - Controls.p0.x, y - Controls.p0.y)) *(parent.uwaves-1))"
+  expr1 "sin( (atan(x - Controls.p0.x, y - Controls.p0.y)+(175/(parent.uwaves-1)*2)) *(parent.uwaves-1))"
+  name radialWave
+  xpos 739
+  ypos -315
+ }
+push $N6b4e54b0
+ Expression {
+  temp_name0 aspectx
+  temp_expr0 "displace_relative ? (width/RampFormat.width) : 1"
+  temp_name1 aspecty
+  temp_expr1 "displace_relative ? (height/RampFormat.height) : 1"
+  expr0 sin((y/height)*parent.uwaves*aspecty*pi)/aspecty
+  expr1 sin((x/width)*parent.vwaves*aspectx*pi)/aspectx
+  name uvWave
+  xpos 741
+  ypos -380
+ }
+push $N6b55f1c0
+ Dot {
+  name Dot9
+  xpos 856
+  ypos -279
+ }
+ Expression {
+  temp_name0 aspectx
+  temp_expr0 "displace_relative ? (width/RampFormat.width) : 1"
+  temp_name1 aspecty
+  temp_expr1 "displace_relative ? (height/RampFormat.height) : 1"
+  expr0 "noise(x/width*aspectx*frequency,y/height*aspecty*frequency, 10)"
+  expr1 "noise(x/width*aspectx*frequency,y/height*aspecty*frequency, 20)"
+  name uvNoise
+  xpos 741
+  ypos -282
+ }
+ Switch {
+  inputs 4
+  which {{parent.displace}}
+  name Switch2
+  xpos 574
+  ypos -335
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out2 forward
+  name ShuffleCopy4
+  xpos 574
+  ypos -298
+ }
+ IDistort {
+  channels rgba
+  uv forward
+  uv_scale 0
+  blur_scale 0
+  name IDistort1
+  knobChanged "if nuke.thisKnob().name() == 'uv_scale':\n\tif nuke.thisKnob().value() == 0:\n\t\tnuke.thisNode()\['disable'].setValue(True)\n\telse:\n\t\tnuke.thisNode()\['disable'].setValue(False)"
+  xpos 574
+  ypos -255
+ }
+ Dot {
+  name Dot17
+  xpos 403
+  ypos -252
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge2
+  xpos 369
+  ypos -108
+  disable {{!parent.mask}}
+ }
+set N6b560d40 [stack 0]
+ Dot {
+  name Dot12
+  xpos 403
+  ypos -37
+ }
+ STMap {
+  inputs 2
+  channels rgba
+  uv rgba
+  blur_scale 0
+  filter {{Remap.filter}}
+  name Remap1
+  xpos 219
+  ypos -40
+ }
+push $N6b0bfeb0
+push $N6b560d40
+ Merge2 {
+  inputs 2
+  metainput A
+  Bchannels {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  maskChannelInput rgba.alpha
+  invert_mask true
+  name Merge3
+  xpos 97
+  ypos -114
+ }
+ Switch {
+  inputs 2
+  which {{parent.output}}
+  name Switch3
+  xpos 97
+  ypos -40
+ }
+ Output {
+  name Output1
+  xpos 97
+  ypos 11
+ }
+ Ramp {
+  inputs 0
+  p0 {0 240}
+  p1 {640 240}
+  name Controls
+  xpos 367
+  ypos -829
+  disable true
+ }
+end_group

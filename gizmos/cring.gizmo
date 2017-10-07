@@ -1,0 +1,85 @@
+#! /Applications/Nuke9.0v6.bak/Nuke9.0v6.app/Contents/MacOS//libnuke-9.0.6.dylib -nx
+version 9.0 v6
+Gizmo {
+ addUserKnob {20 User}
+ addUserKnob {7 pradius l Radius R 0 1000}
+ pradius 200
+ addUserKnob {7 pthickness l thickness R 0.001 1}
+ pthickness 0.3
+ addUserKnob {41 shift l center T Radial2.shift}
+ addUserKnob {41 setcenterinput l " input center " -STARTLINE T Radial2.setcenterinput}
+ addUserKnob {41 setcenterinputexpr l " input center expr " -STARTLINE T Radial2.setcenterinputexpr}
+ addUserKnob {41 setcenterroot l " root center " -STARTLINE T Radial2.setcenterroot}
+ addUserKnob {41 useaspect l "use pixel aspect" T Radial2.useaspect}
+ addUserKnob {6 pcrop l crop +STARTLINE}
+ pcrop true
+}
+ Input {
+  inputs 0
+  name Input1
+  selected true
+  xpos 245
+  ypos -334
+ }
+ Radial {
+  cliptype none
+  area {{-radius+shift.x} {(-radius2*pixel_aspect)+shift.y} {radius+shift.x} {(radius2*pixel_aspect)+shift.y}}
+  softness 0
+  name Radial2
+  xpos 245
+  ypos -263
+  addUserKnob {20 Radius}
+  addUserKnob {22 squareexpr l "inject radius expr" -STARTLINE T "this=nuke.thisNode()\nradius=this.knob('radius')\nx1='-radius+shift.x'\nx2='(-radius2*pixel_aspect)+shift.y'\nx3='radius+shift.x'\nx4='(radius2*pixel_aspect)+shift.y'\nthis.knob('area').setExpression(x1,0)\nthis.knob('area').setExpression(x2,1)\nthis.knob('area').setExpression(x3,2)\nthis.knob('area').setExpression(x4,3)"}
+  addUserKnob {22 linkhv l " link hv " -STARTLINE T "this=nuke.thisNode()\nthis.knob('radius2').setExpression('useaspect?radius/pixel_aspect:radius')"}
+  addUserKnob {22 unlinkhv l " unlink hv " -STARTLINE T nuke.thisNode().knob('radius2').clearAnimated()}
+  addUserKnob {26 ""}
+  addUserKnob {7 radius l "radius h" R 0 2000}
+  radius {{pradius}}
+  addUserKnob {7 radius2 l "radius v" R 0 2000}
+  radius2 {{useaspect?radius/pixel_aspect:radius}}
+  addUserKnob {12 shift l center}
+  shift {320 240}
+  addUserKnob {22 setcenterinput l " input center " -STARTLINE T "this=nuke.thisNode()\nif this.input(0) :\n        x=this.input(0).width()/2\n        y=this.input(0).height()/2\nelse:\n        x=nuke.root().width()/2\n        y=nuke.root().height()/2\nthis.knob('shift').clearAnimated()\nthis.knob('shift').setValue(\[x,y])"}
+  addUserKnob {22 setcenterinputexpr l " input center expr " -STARTLINE T "this=nuke.thisNode()\nx='input.width/2'\ny='input.height/2'\nthis.knob('shift').setExpression(x,0)\nthis.knob('shift').setExpression(y,1)\n"}
+  addUserKnob {22 setcenterroot l " root center " -STARTLINE T "this=nuke.thisNode()\nx=nuke.root().width()/2\ny=nuke.root().height()/2\nthis.knob('shift').clearAnimated()\nthis.knob('shift').setValue(\[x,y])"}
+  addUserKnob {6 useaspect l "use pixel aspect" +STARTLINE}
+  useaspect true
+ }
+set N2998f3c0 [stack 0]
+ Transform {
+  scale {{1-pthickness}}
+  center {{Radial2.shift} {Radial2.shift}}
+  black_outside false
+  name Transform1
+  xpos 312
+  ypos -184
+ }
+push $N2998f3c0
+ Merge2 {
+  inputs 2
+  operation stencil
+  name Merge1
+  xpos 245
+  ypos -119
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  name Crop1
+  xpos 245
+  ypos -89
+  disable {{!pcrop}}
+ }
+ Output {
+  name Output1
+  xpos 245
+  ypos -22
+ }
+push $N2998f3c0
+ Viewer {
+  frame_range 1-100
+  fps 25
+  name Viewer1
+  xpos 245
+  ypos 67
+ }
+end_group

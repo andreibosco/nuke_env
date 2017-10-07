@@ -1,0 +1,616 @@
+#! /mill3d/server/apps/FOUNDRY/linux-x86-64/Nuke8.0v3/libnuke-8.0.v3.so -nx
+version 8.0 v3
+Gizmo {
+ tile_color 0x75afd3ff
+ gl_color 0x89c6edff
+ label "<i>by JMB<i>"
+ addUserKnob {20 guides l Guides}
+ addUserKnob {26 Vertical l <b>Vertical<b>}
+ addUserKnob {41 line_v1 T NoOp3.line_v1}
+ addUserKnob {41 line_v2 T NoOp3.line_v2}
+ addUserKnob {41 line_v3 T NoOp3.line_v3}
+ addUserKnob {41 line_v4 T NoOp3.line_v4}
+ addUserKnob {26 Horizontal l <b>Horizontal<b>}
+ addUserKnob {41 line_h1 T NoOp3.line_h1}
+ addUserKnob {41 line_h2 T NoOp3.line_h2}
+ addUserKnob {41 line_h3 T NoOp3.line_h3}
+ addUserKnob {41 line_h4 T NoOp3.line_h4}
+ addUserKnob {26 ""}
+ addUserKnob {41 guide_opacity l "Guide Opacity" T Merge11.mix}
+ addUserKnob {26 ""}
+ addUserKnob {26 createby l "" +STARTLINE T "Created By Jason M. Bergman\nVersion 1.0"}
+ addUserKnob {20 rulerTab l Rulers}
+ addUserKnob {41 flopRulers l "Flop Rulers" T NoOp4.flopRulers}
+ addUserKnob {41 RulerSlider l "Ruler Scale" T NoOp1.topbtmRulerSlide}
+ addUserKnob {41 lineWidth l "Line Width" T NoOp4.lineWidth}
+ addUserKnob {41 ruler_opacity l "Ruler Opacity" T Merge16.mix}
+ addUserKnob {20 grid l Grid}
+ addUserKnob {41 gridOnOff l "Grid On/Off" T NoOp2.gridOnOff}
+ addUserKnob {41 lineWidth_1 l "Line Width" T NoOp4.lineWidth}
+ addUserKnob {41 value l opacity T Multiply2.value}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x1e1e1eff
+  label grid
+  note_font_size 45
+  xpos 320
+  ypos -489
+  bdwidth 593
+  bdheight 389
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x1e1e1eff
+  label guides
+  note_font_size 45
+  xpos -2076
+  ypos -111
+  bdwidth 989
+  bdheight 813
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x1e1e1eff
+  label Top_left_rulers
+  note_font_size 42
+  xpos -193
+  ypos -1393
+  bdwidth 500
+  bdheight 651
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x1e1e1eff
+  label btm_right_rulers
+  note_font_size 42
+  xpos 919
+  ypos -1415
+  bdwidth 496
+  bdheight 713
+ }
+ NoOp {
+  inputs 0
+  name NoOp1
+  label "ruler grid size"
+  xpos 461
+  ypos -1709
+  addUserKnob {20 User}
+  addUserKnob {7 topbtmRulerSlide l "Ruler Size" R 100 300}
+  topbtmRulerSlide 150
+ }
+ NoOp {
+  inputs 0
+  name NoOp2
+  label "grid on/off"
+  xpos -736
+  ypos -178
+  addUserKnob {20 User}
+  addUserKnob {6 gridOnOff l "Grid On/Off" +STARTLINE}
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  color {0 1 1 0}
+  color_panelDropped true
+  name Constant3
+  xpos -1644
+  ypos -21
+ }
+ Dot {
+  name Dot3
+  xpos -1610
+  ypos 51
+ }
+set N582d1510 [stack 0]
+ Crop {
+  box {0 {NoOp3.line_h4.y} 1920 {(NoOp3.line_h4.y)-2}}
+  name CropH4
+  xpos -1217
+  ypos 282
+ }
+push $N582d1510
+ Crop {
+  box {0 {NoOp3.line_h3.y} 1920 {(NoOp3.line_h3.y)-2}}
+  name CropH3
+  xpos -1325
+  ypos 282
+ }
+push $N582d1510
+ Crop {
+  box {0 {NoOp3.line_h2.y} 1920 {(NoOp3.line_h2.y)-2}}
+  name CropH2
+  xpos -1439
+  ypos 282
+ }
+push $N582d1510
+ Crop {
+  box {0 {NoOp3.line_h1.y} 1920 {(NoOp3.line_h1.y)-2}}
+  name CropH1
+  xpos -1555
+  ypos 285
+ }
+push $N582d1510
+ Crop {
+  box {{NoOp3.line_v4.x} 0 {(NoOp3.line_v4.x)-2} 1080}
+  name CropV4
+  xpos -1702
+  ypos 285
+ }
+push $N582d1510
+ Crop {
+  box {{NoOp3.line_v3.x} 0 {(NoOp3.line_v3.x)-2} 1080}
+  name CropV3
+  xpos -1811
+  ypos 284
+ }
+push 0
+push $N582d1510
+ Crop {
+  box {{NoOp3.line_v1.x} 0 {(NoOp3.line_v1.x)-2} 1080}
+  name CropV1
+  xpos -2019
+  ypos 287
+ }
+push $N582d1510
+ Crop {
+  box {{NoOp3.line_v2.x} 0 {(NoOp3.line_v2.x)-2} 1080}
+  name CropV2
+  xpos -1924
+  ypos 286
+ }
+ Merge2 {
+  inputs 8+1
+  name Merge1
+  xpos -1645
+  ypos 535
+ }
+ NoOp {
+  name NoOp3
+  xpos -1641
+  ypos 606
+  addUserKnob {20 User}
+  addUserKnob {12 line_v1}
+  line_v1 {-100 600}
+  addUserKnob {12 line_v2}
+  line_v2 {-100 550}
+  addUserKnob {12 line_v3}
+  line_v3 {-100 500}
+  addUserKnob {12 line_v4}
+  line_v4 {-100 450}
+  addUserKnob {12 line_h1}
+  line_h1 {50 -50}
+  addUserKnob {12 line_h2}
+  line_h2 {200 -50}
+  addUserKnob {12 line_h3}
+  line_h3 {350 -50}
+  addUserKnob {12 line_h4}
+  line_h4 {500 -50}
+ }
+ Crop {
+  box {{root.format.x} {root.format.y} {root.format.r} {root.format.t}}
+  name Crop1
+  xpos -1641
+  ypos 648
+ }
+ Dot {
+  name Dot2
+  xpos -1607
+  ypos 817
+ }
+ Grid {
+  inputs 0
+  number {0 {((NoOp1.topbtmRulerSlide)/1.25)/5}}
+  size {{(NoOp4.lineWidth)}}
+  name Grid7
+  xpos 783
+  ypos -385
+ }
+ Multiply {
+  value 0.1
+  name Multiply2
+  xpos 783
+  ypos -335
+ }
+ set C704ac560 [stack 0]
+ Grid {
+  inputs 0
+  number {0 {(NoOp1.topbtmRulerSlide)/1.25}}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid6
+  xpos 658
+  ypos -390
+ }
+ Multiply {
+  value {{(Multiply2.value)/2}}
+  name Multiply1
+  xpos 658
+  ypos -340
+ }
+ set C5818afd0 [stack 0]
+push 0
+ Grid {
+  inputs 0
+  number {{NoOp1.topbtmRulerSlide} 1}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid8
+  xpos 370
+  ypos -398
+ }
+clone $C5818afd0 {
+  xpos 370
+  ypos -337
+  selected false
+ }
+ Grid {
+  inputs 0
+  number {{(NoOp1.topbtmRulerSlide)/5} 1}
+  size {{(NoOp4.lineWidth)}}
+  name Grid5
+  xpos 522
+  ypos -385
+ }
+clone $C704ac560 {
+  xpos 522
+  ypos -339
+  selected false
+ }
+ Merge2 {
+  inputs 4+1
+  name Merge21
+  xpos 591
+  ypos -170
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)+30} {(root.format.r) x92 -307} {(root.format.t)}}
+  name RulerCropLrg3
+  xpos 1167
+  ypos -866
+ }
+ Invert {
+  name Invert7
+  xpos 1167
+  ypos -840
+ }
+ Grid {
+  inputs 0
+  number {{(NoOp1.topbtmRulerSlide)/5} 1}
+  size {{(NoOp4.lineWidth)}}
+  name Grid9
+  xpos 1277
+  ypos -788
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge9
+  xpos 1167
+  ypos -788
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)+20} {(root.format.r)} {(root.format.t)}}
+  name RulerCropSm3
+  xpos 1167
+  ypos -1011
+ }
+ Invert {
+  name Invert8
+  xpos 1167
+  ypos -985
+ }
+ Grid {
+  inputs 0
+  number {{NoOp1.topbtmRulerSlide} 1}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid12
+  xpos 1277
+  ypos -912
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge10
+  xpos 1167
+  ypos -912
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)} {(root.format.r)-30} {(root.format.t)}}
+  name RulerCropLrg1
+  xpos 1167
+  ypos -1164
+ }
+ Invert {
+  name Invert4
+  xpos 1167
+  ypos -1138
+ }
+ Grid {
+  inputs 0
+  number {0 {((NoOp1.topbtmRulerSlide)/1.25)/5}}
+  size {{(NoOp4.lineWidth)}}
+  name Grid11
+  xpos 1297
+  ypos -1069
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge14
+  xpos 1166
+  ypos -1069
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)} {(root.format.r)-20} {(root.format.t)}}
+  name RulerCropSm1
+  xpos 1005
+  ypos -1329
+ }
+ Invert {
+  name Invert3
+  xpos 1005
+  ypos -1290
+ }
+ Grid {
+  inputs 0
+  number {0 {(NoOp1.topbtmRulerSlide)/1.25}}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid10
+  xpos 1154
+  ypos -1226
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge15
+  xpos 1005
+  ypos -1226
+ }
+ Merge2 {
+  inputs 2
+  name Merge18
+  xpos 1005
+  ypos -1069
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  name Merge12
+  xpos 1005
+  ypos -912
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  name Merge13
+  xpos 1005
+  ypos -788
+ }
+ Dot {
+  name Dot1
+  xpos 1039
+  ypos -671
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)+30} {(root.format.y)} {(root.format.r)} {(root.format.t)}}
+  name RulerCropLrg2
+  xpos 40
+  ypos -877
+ }
+ Invert {
+  name Invert5
+  xpos 40
+  ypos -851
+ }
+ Grid {
+  inputs 0
+  number {0 {((NoOp1.topbtmRulerSlide)/1.25)/5}}
+  size {{(NoOp4.lineWidth)}}
+  name Grid4
+  xpos 191
+  ypos -803
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge7
+  xpos 40
+  ypos -803
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)+20} {(root.format.y)} {(root.format.r)} {(root.format.t)}}
+  name RulerCropSm2
+  xpos 50
+  ypos -1013
+ }
+ Invert {
+  name Invert6
+  xpos 50
+  ypos -987
+ }
+ Grid {
+  inputs 0
+  number {0 {(NoOp1.topbtmRulerSlide)/1.25}}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid2
+  xpos 160
+  ypos -916
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge3
+  xpos 50
+  ypos -916
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)} {(root.format.r)} {(root.format.t)-30}}
+  name RulerCropLrg
+  xpos 40
+  ypos -1151
+ }
+ Invert {
+  name Invert2
+  xpos 40
+  ypos -1125
+ }
+ Grid {
+  inputs 0
+  number {{(NoOp1.topbtmRulerSlide)/5} 1}
+  size {{(NoOp4.lineWidth)}}
+  name Grid3
+  xpos 150
+  ypos -1058
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge5
+  xpos 40
+  ypos -1058
+ }
+ Crop {
+  inputs 0
+  box {{(root.format.x)} {(root.format.y)} {(root.format.r)} {(root.format.t)-20}}
+  name RulerCropSm
+  xpos -124
+  ypos -1292
+ }
+ Invert {
+  name Invert1
+  xpos -124
+  ypos -1249
+ }
+ Grid {
+  inputs 0
+  number {{NoOp1.topbtmRulerSlide} 1}
+  size {{(NoOp4.lineWidth)/5}}
+  name Grid1
+  xpos 7
+  ypos -1182
+ }
+ Merge2 {
+  inputs 2
+  operation in
+  name Merge2
+  xpos -124
+  ypos -1182
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  name Merge6
+  xpos -124
+  ypos -1058
+ }
+ Merge2 {
+  inputs 2
+  name Merge4
+  xpos -121
+  ypos -916
+ }
+ Merge2 {
+  inputs 2
+  name Merge8
+  xpos -121
+  ypos -803
+ }
+ Switch {
+  inputs 2
+  which {{NoOp4.flopRulers}}
+  name Switch1
+  xpos -121
+  ypos -675
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  color {1 1 1 0}
+  color_panelDropped true
+  name Constant1
+  xpos -339
+  ypos -764
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos -339
+  ypos -681
+ }
+ Premult {
+  name Premult1
+  xpos -339
+  ypos -643
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos -585
+  ypos -1409
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  mix 0.3
+  name Merge16
+  xpos -585
+  ypos -643
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  name gridMerge
+  xpos -585
+  ypos -170
+  disable {{NoOp2.gridOnOff-1}}
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  mix 0.5
+  name Merge11
+  xpos -585
+  ypos 813
+ }
+ Crop {
+  box {{root.format.x} {root.format.y} {root.format.r} {root.format.t}}
+  name Crop2
+  xpos -585
+  ypos 839
+ }
+ Output {
+  name Output1
+  xpos -585
+  ypos 983
+ }
+ Viewer {
+  viewerProcess rec709
+  input_process false
+  name Viewer1
+  xpos -585
+  ypos 1275
+ }
+ NoOp {
+  inputs 0
+  name NoOp4
+  label flopRulers
+  xpos -121
+  ypos -526
+  addUserKnob {20 User}
+  addUserKnob {7 lineWidth l "Line Width" R 0 4}
+  lineWidth 2.5
+  addUserKnob {6 flopRulers l "Flop Rulers" +STARTLINE}
+ }
+end_group

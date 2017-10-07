@@ -1,0 +1,288 @@
+Gizmo {
+ help "This gizmo allows you to do 8 or 4 point grads.  You can use sampling or set values."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() in ('chgrad', 'showPanel'):\n\n   chgrad = n\['chgrad'].value()\n\n   if chgrad == '4 point grad':\n\n       n\['topm'].setVisible(False)\n\n       n\['TLmadd'].setVisible(False)\n\n       n\['Tpm'].setVisible(False)\n\n       n\['rightm'].setVisible(False)\n\n       n\['Rightadd'].setVisible(False)\n\n       n\['Rtm'].setVisible(False)\n\n       n\['bottomm'].setVisible(False)\n\n       n\['Bmmadd'].setVisible(False)\n\n       n\['Bmm'].setVisible(False)\n\n       n\['leftm'].setVisible(False)\n\n       n\['BLmadd'].setVisible(False)\n\n       n\['Lfm'].setVisible(False)\n\n   else:\n\n       n\['topm'].setVisible(True)\n\n       n\['TLmadd'].setVisible(True)\n\n       n\['Tpm'].setVisible(True)\n\n       n\['rightm'].setVisible(True)\n\n       n\['Rightadd'].setVisible(True)\n\n       n\['Rtm'].setVisible(True)\n\n       n\['bottomm'].setVisible(True)\n\n       n\['Bmmadd'].setVisible(True)\n\n       n\['Bmm'].setVisible(True)\n\n       n\['leftm'].setVisible(True)\n\n       n\['BLmadd'].setVisible(True)\n\n       n\['Lfm'].setVisible(True)"
+ tile_color 0x3f3f3fff
+ name Grad_CB
+ note_font_color 0xe5e5e5ff
+ addUserKnob {20 Buehler l Grad_CB}
+ addUserKnob {4 chgrad l "<font size=\"3\"><font color=\"Goldenrod\">choose" t "Select 4 or 8 point grad" M {"4 point grad" "8 point grad"}}
+ addUserKnob {12 pin1 l to1}
+ addUserKnob {22 currentres l "current resolution" t "reset the corner pin to the current resolution" -STARTLINE T "\nfor i in xrange(1,5):\n  n=nuke.thisNode()\n  n\['pin'+ str(i)].setValue( n\['pinF'+ str(i)].value() )"}
+ addUserKnob {12 pin2 l to2}
+ pin2 {2048 0}
+ addUserKnob {12 pin3 l to3}
+ pin3 {2048 1556}
+ addUserKnob {12 pin4 l to4}
+ pin4 {0 1556}
+ addUserKnob {6 bout l "black outside" -STARTLINE}
+ bout true
+ addUserKnob {26 ""}
+ addUserKnob {18 LeftTm l TL t pin4}
+ LeftTm {0 0 0}
+ addUserKnob {6 TLadd l add t "adds the user defined values" -STARTLINE}
+ addUserKnob {4 TLm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE M {sample "user input" BL BR TR Bottom Right Top Left}}
+ addUserKnob {18 topm l Top +HIDDEN}
+ topm {0 0 0}
+ addUserKnob {6 TLmadd l add t "adds the user defined values" -STARTLINE +HIDDEN}
+ addUserKnob {4 Tpm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE +HIDDEN M {sample "user input" BL BR TR TL Bottom Right Left}}
+ addUserKnob {18 RightTm l TR t pin3}
+ RightTm {0 0 0}
+ addUserKnob {6 Tpmadd l add t "adds the user defined values" -STARTLINE}
+ addUserKnob {4 TRm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE M {sample "user input" BL BR TL Bottom Right Top Left}}
+ addUserKnob {18 rightm l Right +HIDDEN}
+ rightm {0 0 0}
+ addUserKnob {6 Rightadd l add t "adds the user defined values" -STARTLINE +HIDDEN}
+ addUserKnob {4 Rtm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE +HIDDEN M {sample "user input" BL BR TR TL Bottom Top Left}}
+ addUserKnob {18 RightBm l BR t pin2}
+ RightBm {0 0 0}
+ addUserKnob {6 BRmadd l add t "adds the user defined values" -STARTLINE}
+ addUserKnob {4 BRm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE M {sample "user input" BL TR TL Bottom Right Top Left}}
+ addUserKnob {18 bottomm l Bottom +HIDDEN}
+ bottomm {0 0 0}
+ addUserKnob {6 Bmmadd l add t "adds the user defined values" -STARTLINE +HIDDEN}
+ addUserKnob {4 Bmm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE +HIDDEN M {sample "user input" BL BR TR TL Right Top Left}}
+ addUserKnob {18 LeftBm l BL t pin1}
+ LeftBm {0 0 0}
+ addUserKnob {6 LeftBmadd l add t "adds the user defined values" -STARTLINE}
+ addUserKnob {4 BLm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE M {sample "user input" BR TR TL Bottom Right Top Left}}
+ addUserKnob {18 leftm l Left +HIDDEN}
+ leftm {0 0 0}
+ addUserKnob {6 BLmadd l add t "adds the user defined values" -STARTLINE +HIDDEN}
+ addUserKnob {4 Lfm l "" t "choose from image sample, user defined or let another sample area drive it" -STARTLINE +HIDDEN M {sample "user input" BL BR TR TL Bottom Right Top}}
+ addUserKnob {20 pinFrom l INVISIBLE +INVISIBLE n 1}
+ pinFrom 0
+ addUserKnob {12 pinF1 l INVISIBLE +INVISIBLE}
+ addUserKnob {12 pinF2 l INVISIBLE +INVISIBLE}
+ pinF2 {{width} 0}
+ addUserKnob {12 pinF3 l INVISIBLE +INVISIBLE}
+ pinF3 {{width} {height}}
+ addUserKnob {12 pinF4 l INVISIBLE +INVISIBLE}
+ pinF4 {0 {height}}
+ addUserKnob {32 Chad l ChadB t "Go to nukepedia.com to download the latest version, leave a comment/request or a bug." T "start https://www.linkedin.com/in/chadbuehler" +STARTLINE}
+ addUserKnob {26 version l "" -STARTLINE T "                              - by Chad Buehler    v1.1  "}
+ addUserKnob {20 samplesize l "sample size"}
+ addUserKnob {41 grow T Expr.grow}
+}
+ Input {
+  inputs 0
+  name SourceImage
+  xpos -542
+  ypos -245
+ }
+set N2513bf60 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha white
+  name Shuffle1
+  xpos -647
+  ypos -155
+ }
+add_layer {rgb rgb.red rgb.green rgb.blue rgb.alpha}
+ Expression {
+  temp_name0 BLeft
+  temp_expr0 "cgrad == 1 ? clamp((1-x/width*2)*(1-y/height*2)) * (1-((-(x * (height/width))) + (width*(height/width)) > y ? 0 : 1)) : (1-x/width)*(1-y/height)"
+  temp_name1 BRight
+  temp_expr1 "cgrad == 1 ? clamp(-(1-x/width*2)*(1-y/height*2)) * (x  * (height/width) > y ? 1 : 0) : (x/width)*(1-y/height)"
+  temp_name2 TRight
+  temp_expr2 "cgrad == 1 ? clamp((1-x/width*2)*(1-y/height*2)) * ((-(x * (height/width))) + (width*(height/width)) > y ? 0 : 1) : (x/width)*(y/height)"
+  temp_name3 TLeft
+  temp_expr3 "cgrad == 1 ? clamp(-(1-x/width*2)*(1-y/height*2)) * (x * (height/width) > y ? 0 : 1) : (1-x/width)*(y/height)"
+  expr0 BL.r*BLeft+BR.r*BRight+TR.r*TRight+TL.r*TLeft
+  expr1 BL.g*BLeft+BR.g*BRight+TR.g*TRight+TL.g*TLeft
+  expr2 BL.b*BLeft+BR.b*BRight+TR.b*TRight+TL.b*TLeft
+  expr3 1*BLeft+1*BRight+1*TRight+1*TLeft
+  name Expr
+  tile_color 0x3fffff
+  note_font_color 0xffffffff
+  xpos -647
+  ypos -123
+  addUserKnob {20 Buehler l User}
+  addUserKnob {7 cgrad l "choose grad"}
+  cgrad {{chgrad i}}
+  addUserKnob {12 grow}
+  grow {10 10}
+  addUserKnob {18 BL l "bottom Left"}
+  BL {{"(BLm == 0 ? \[sample NoOp red (CPin2D.to1.x+grow.x/2) (CPin2D.to1.y+grow.y/2) grow.x grow.y] : BLm == 1 ? LeftBm.r : BLm == 2 ? BR : BLm == 3 ? TR : BLm == 4 ? TL : BLm == 5 ? Expr1.Bm : BLm == 6 ? Expr1.Rt : BLm == 7 ? Expr1.Tp :  Expr1.Lf) + (LeftBmadd > 0 && BLm != 1 ? LeftBm.r : 0)" i} {"(BLm == 0 ? \[sample NoOp green (CPin2D.to1.x+grow.x/2) (CPin2D.to1.y+grow.y/2) grow.x grow.y] : BLm == 1 ? LeftBm.g : BLm == 2 ? BR : BLm == 3 ? TR : BLm == 4 ? TL : BLm == 5 ? Expr1.Bm : BLm == 6 ? Expr1.Rt : BLm == 7 ? Expr1.Tp :  Expr1.Lf) + (LeftBmadd > 0 && BLm != 1 ? LeftBm.g : 0)" i} {"(BLm == 0 ? \[sample NoOp blue (CPin2D.to1.x+grow.x/2) (CPin2D.to1.y+grow.y/2) grow.x grow.y] : BLm == 1 ? LeftBm.b : BLm == 2 ? BR : BLm == 3 ? TR : BLm == 4 ? TL : BLm == 5 ? Expr1.Bm : BLm == 6 ? Expr1.Rt : BLm == 7 ? Expr1.Tp :  Expr1.Lf) + (LeftBmadd > 0 && BLm != 1 ? LeftBm.b : 0)" i}}
+  addUserKnob {18 BR l "bottom right"}
+  BR {{"(BRm == 0 ? \[sample NoOp red (CPin2D.to2.x-grow.x/2) (CPin2D.to2.y+grow.y/2) grow.x grow.y] : BRm == 1 ? RightBm.r : BRm == 2 ? BL : BRm == 3 ? TR : BRm == 4 ? TL : BRm == 5 ? Expr1.Bm : BRm == 6 ? Expr1.Rt : BRm == 7 ? Expr1.Tp :  Expr1.Lf) + (BRmadd > 0 && BRm != 1 ? RightBm.r : 0)\n" i} {"(BRm == 0 ? \[sample NoOp green (CPin2D.to2.x-grow.x/2) (CPin2D.to2.y+grow.y/2) grow.x grow.y] : BRm == 1 ? RightBm.g : BRm == 2 ? BL : BRm == 3 ? TR : BRm == 4 ? TL : BRm == 5 ? Expr1.Bm : BRm == 6 ? Expr1.Rt : BRm == 7 ? Expr1.Tp : Expr1.Lf) + (BRmadd > 0 && BRm != 1 ? RightBm.g : 0)\n" i} {"(BRm == 0 ? \[sample NoOp blue (CPin2D.to2.x-grow.x/2) (CPin2D.to2.y+grow.y/2) grow.x grow.y] : BRm == 1 ? RightBm.b : BRm == 2 ? BL : BRm == 3 ? TR : BRm == 4 ? TL : BRm == 5 ? Expr1.Bm : BRm == 6 ? Expr1.Rt : BRm == 7 ? Expr1.Tp :  Expr1.Lf) + (BRmadd > 0 && BRm != 1 ? RightBm.b : 0)\n" i}}
+  addUserKnob {18 TR l "top right"}
+  TR {{"(TRm == 0 ? \[sample NoOp red (CPin2D.to3.x-grow.x/2) (CPin2D.to3.y-grow.y/2) grow.x grow.y] : TRm == 1 ? RightTm.r : TRm == 2 ? BL : TRm == 3 ? BR : TRm == 4 ? TL : TRm == 5 ? Expr1.Bm : TRm == 6 ? Expr1.Rt : TRm == 7 ? Expr1.Tp :  Expr1.Lf) + (Tpmadd > 0 && TRm != 1 ? RightTm.r : 0)\n" i} {"(TRm == 0 ? \[sample NoOp green (CPin2D.to3.x-grow.x/2) (CPin2D.to3.y-grow.y/2) grow.x grow.y] : TRm == 1 ? RightTm.g : TRm == 2 ? BL : TRm == 3 ? BR : TRm == 4 ? TL : TRm == 5 ? Expr1.Bm : TRm == 6 ? Expr1.Rt : TRm == 7 ? Expr1.Tp :  Expr1.Lf) + (Tpmadd > 0 && TRm != 1 ? RightTm.g : 0)\n" i} {"(TRm == 0 ? \[sample NoOp blue (CPin2D.to3.x-grow.x/2) (CPin2D.to3.y-grow.y/2) grow.x grow.y] : TRm == 1 ? RightTm.b : TRm == 2 ? BL : TRm == 3 ? BR : TRm == 4 ? TL : TRm == 5 ? Expr1.Bm : TRm == 6 ? Expr1.Rt : TRm == 7 ? Expr1.Tp :  Expr1.Lf) + (Tpmadd > 0 && TRm != 1 ? RightTm.b : 0)\n" i}}
+  addUserKnob {18 TL l "top left"}
+  TL {{"(TLm == 0 ? \[sample NoOp red (CPin2D.to4.x+grow.x/2) (CPin2D.to4.y-grow.y/2) grow.x grow.y] : TLm == 1 ? LeftTm.r : TLm == 2 ? BL : TLm == 3 ? BR : TLm == 4 ? TR : TLm == 5 ? Expr1.Bm : TLm == 6 ? Expr1.Rt : TLm == 7 ? Expr1.Tp :  Expr1.Lf) + (TLadd > 0 && TLm != 1 ? LeftTm.r : 0)\n" i} {"(TLm == 0 ? \[sample NoOp green (CPin2D.to4.x+grow.x/2) (CPin2D.to4.y-grow.y/2) grow.x grow.y] : TLm == 1 ? LeftTm.g : TLm == 2 ? BL : TLm == 3 ? BR : TLm == 4 ? TR : TLm == 5 ? Expr1.Bm : TLm == 6 ? Expr1.Rt : TLm == 7 ? Expr1.Tp :  Expr1.Lf) + (TLadd > 0 && TLm != 1 ? LeftTm.g : 0)\n" i} {"(TLm == 0 ? \[sample NoOp blue (CPin2D.to4.x+grow.x/2) (CPin2D.to4.y-grow.y/2) grow.x grow.y] : TLm == 1 ? LeftTm.b : TLm == 2 ? BL : TLm == 3 ? BR : TLm == 4 ? TR : TLm == 5 ? Expr1.Bm : TLm == 6 ? Expr1.Rt : TLm == 7 ? Expr1.Tp :  Expr1.Lf) + (TLadd > 0 && TLm != 1 ? LeftTm.b : 0)\n" i}}
+ }
+ Expression {
+  temp_name0 Bc
+  temp_expr0 max(((min((y-(height/2))/height,0))*-2)-a,0)
+  temp_name1 Rc
+  temp_expr1 max(((max((x-(width/2))/width,0))*2)-a,0)
+  temp_name2 Tc
+  temp_expr2 max(((max((y-(height/2))/height,0))*2)-a,0)
+  temp_name3 Lc
+  temp_expr3 max(((min((x-(width/2))/width,0))*-2)-a,0)
+  expr0 (Bm.r*Bc+Rt.r*Rc+Tp.r*Tc+Lf.r*Lc)+r
+  expr1 (Bm.g*Bc+Rt.g*Rc+Tp.g*Tc+Lf.g*Lc)+g
+  expr2 (Bm.b*Bc+Rt.b*Rc+Tp.b*Tc+Lf.b*Lc)+b
+  expr3 (1*Bc+1*Rc+1*Tc+1*Lc)+a
+  name Expr1
+  tile_color 0x3fffff
+  note_font_color 0xffffffff
+  xpos -647
+  ypos -93
+  disable {{"Expr.cgrad == 1 ? 0 : 1" i}}
+  addUserKnob {20 Buehler l User}
+  addUserKnob {18 Bm l bottom}
+  Bm {{"(Bmm == 0 ? \[sample NoOp red CPin2D.h1.x (CPin2D.h1.y+Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Bmm == 1 ? bottomm.r : Bmm == 2 ? Expr.BL : Bmm == 3 ? Expr.BR : Bmm == 4 ? Expr.TR : Bmm == 5 ? Expr.TL : Bmm == 6 ? Rt : Bmm == 7 ? Tp :  Lf) + (Bmmadd > 0 && Bmm != 1 ? bottomm.r : 0)\n" i} {"(Bmm == 0 ? \[sample NoOp green CPin2D.h1.x (CPin2D.h1.y+Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Bmm == 1 ? bottomm.g : Bmm == 2 ? Expr.BL : Bmm == 3 ? Expr.BR : Bmm == 4 ? Expr.TR : Bmm == 5 ? Expr.TL : Bmm == 6 ? Rt : Bmm == 7 ? Tp :  Lf) + (Bmmadd > 0 && Bmm != 1 ? bottomm.g : 0)\n" i} {"(Bmm == 0 ? \[sample NoOp blue CPin2D.h1.x (CPin2D.h1.y+Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Bmm == 1 ? bottomm.b : Bmm == 2 ? Expr.BL : Bmm == 3 ? Expr.BR : Bmm == 4 ? Expr.TR : Bmm == 5 ? Expr.TL : Bmm == 6 ? Rt : Bmm == 7 ? Tp :  Lf) + (Bmmadd > 0 && Bmm != 1 ? bottomm.b : 0)\n" i}}
+  addUserKnob {18 Rt l right}
+  Rt {{"(Rtm == 0 ? \[sample NoOp red (CPin2D.h2.x-Expr.grow.x/2) CPin2D.h2.y Expr.grow.x Expr.grow.y] : Rtm == 1 ? rightm.r : Rtm == 2 ? Expr.BL : Rtm == 3 ? Expr.BR : Rtm == 4 ? Expr.TR : Rtm == 5 ? Expr.TL : Rtm == 6 ? Bm : Rtm == 7 ? Tp :  Lf) + (Rightadd > 0 && Rtm != 1 ? rightm.r : 0)\n" i} {"(Rtm == 0 ? \[sample NoOp green (CPin2D.h2.x-Expr.grow.x/2) CPin2D.h2.y Expr.grow.x Expr.grow.y] : Rtm == 1 ? rightm.g : Rtm == 2 ? Expr.BL : Rtm == 3 ? Expr.BR : Rtm == 4 ? Expr.TR : Rtm == 5 ? Expr.TL : Rtm == 6 ? Bm : Rtm == 7 ? Tp :  Lf) + (Rightadd > 0 && Rtm != 1 ? rightm.g : 0)\n" i} {"(Rtm == 0 ? \[sample NoOp blue (CPin2D.h2.x-Expr.grow.x/2) CPin2D.h2.y Expr.grow.x Expr.grow.y] : Rtm == 1 ? rightm.b : Rtm == 2 ? Expr.BL : Rtm == 3 ? Expr.BR : Rtm == 4 ? Expr.TR : Rtm == 5 ? Expr.TL : Rtm == 6 ? Bm : Rtm == 7 ? Tp :  Lf) + (Rightadd > 0 && Rtm != 1 ? rightm.b : 0)\n" i}}
+  addUserKnob {18 Tp l top}
+  Tp {{"(Tpm == 0 ? \[sample NoOp red CPin2D.h3.x (CPin2D.h3.y-Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Tpm == 1 ? topm.r : Tpm == 2 ? Expr.BL : Tpm == 3 ? Expr.BR : Tpm == 4 ? Expr.TR : Tpm == 5 ? Expr.TL : Tpm == 6 ? Bm : Tpm == 7 ? Rt :  Lf) + (TLmadd > 0 && Tpm != 1 ? topm.r : 0)\n" i} {"(Tpm == 0 ? \[sample NoOp green CPin2D.h3.x (CPin2D.h3.y-Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Tpm == 1 ? topm.g : Tpm == 2 ? Expr.BL : Tpm == 3 ? Expr.BR : Tpm == 4 ? Expr.TR : Tpm == 5 ? Expr.TL : Tpm == 6 ? Bm : Tpm == 7 ? Rt :  Lf) + (TLmadd > 0 && Tpm != 1 ? topm.g : 0)\n" i} {"(Tpm == 0 ? \[sample NoOp blue CPin2D.h3.x (CPin2D.h3.y-Expr.grow.y/2) Expr.grow.x Expr.grow.y] : Tpm == 1 ? topm.b : Tpm == 2 ? Expr.BL : Tpm == 3 ? Expr.BR : Tpm == 4 ? Expr.TR : Tpm == 5 ? Expr.TL : Tpm == 6 ? Bm : Tpm == 7 ? Rt :  Lf) + (TLmadd > 0 && Tpm != 1 ? topm.b : 0)\n" i}}
+  addUserKnob {18 Lf l left}
+  Lf {{"(Lfm == 0 ? \[sample NoOp red (CPin2D.h4.x+Expr.grow.x/2) CPin2D.h4.y Expr.grow.x Expr.grow.y] : Lfm == 1 ? leftm.r : Lfm == 2 ? Expr.BL : Lfm == 3 ? Expr.BR : Lfm == 4 ? Expr.TR : Lfm == 5 ? Expr.TL : Lfm == 6 ? Bm : Lfm == 7 ? Rt :  Tp) + (BLmadd > 0 && Lfm != 1 ? leftm.r : 0)" i} {"(Lfm == 0 ? \[sample NoOp green (CPin2D.h4.x+Expr.grow.x/2) CPin2D.h4.y Expr.grow.x Expr.grow.y] : Lfm == 1 ? leftm.g : Lfm == 2 ? Expr.BL : Lfm == 3 ? Expr.BR : Lfm == 4 ? Expr.TR : Lfm == 5 ? Expr.TL : Lfm == 6 ? Bm : Lfm == 7 ? Rt :  Tp) + (BLmadd > 0 && Lfm != 1 ? leftm.g : 0)" i} {"(Lfm == 0 ? \[sample NoOp blue (CPin2D.h4.x+Expr.grow.x/2) CPin2D.h4.y Expr.grow.x Expr.grow.y] : Lfm == 1 ? leftm.b : Lfm == 2 ? Expr.BL : Lfm == 3 ? Expr.BR : Lfm == 4 ? Expr.TR : Lfm == 5 ? Expr.TL : Lfm == 6 ? Bm : Lfm == 7 ? Rt :  Tp) + (BLmadd > 0 && Lfm != 1 ? leftm.b : 0)" i}}
+ }
+ Expression {
+  temp_name0 cRed
+  temp_expr0 Expr.BL.r+Expr.BR.r+Expr.TR.r+Expr.TL.r+Expr1.Bm.r+Expr1.Rt.r+Expr1.Tp.r+Expr1.Lf.r
+  temp_name1 cGreen
+  temp_expr1 Expr.BL.g+Expr.BR.g+Expr.TR.g+Expr.TL.g+Expr1.Bm.g+Expr1.Rt.g+Expr1.Tp.g+Expr1.Lf.g
+  temp_name2 cBlue
+  temp_expr2 Expr.BL.b+Expr.BR.b+Expr.TR.b+Expr.TL.b+Expr1.Bm.b+Expr1.Rt.b+Expr1.Tp.b+Expr1.Lf.b
+  expr0 "((1-a) * (cRed/8))+r"
+  expr1 "((1-a) * (cGreen/8))+g"
+  expr2 "((1-a) * (cBlue/8))+b"
+  expr3 1
+  name Expr2
+  tile_color 0x3fffff
+  note_font_color 0xffffffff
+  xpos -647
+  ypos -60
+  disable {{"Expr.cgrad == 1 ? 0 : 1" i}}
+ }
+ Expression {
+  expr0 "r + 0.00001 < 0.0005 ? min(r + 0.00001,0) : r"
+  expr1 "g + 0.00001 < 0.0005 ? min(g + 0.00001,0) : g"
+  expr2 "b + 0.00001 < 0.0005 ? min(b + 0.00001,0) : b"
+  name Expr3
+  tile_color 0x3fffff
+  note_font_color 0xffffffff
+  xpos -647
+  ypos -27
+ }
+set N25165ff0 [stack 0]
+ CornerPin2D {
+  to1 {{parent.pin1 i x1 0} {parent.pin1 i x1 0}}
+  to2 {{parent.pin2 i x1 960} {parent.pin2 i x1 0}}
+  to3 {{parent.pin3 i x1 960} {parent.pin3 i x1 720}}
+  to4 {{parent.pin4 i x1 0} {parent.pin4 i x1 720}}
+  invert false
+  from1 {{parent.pinF1 i} {parent.pinF1 i}}
+  from2 {{parent.pinF2 i} {parent.pinF2 i}}
+  from3 {{parent.pinF3 i} {parent.pinF3 i}}
+  from4 {{parent.pinF4 i} {parent.pinF4 i}}
+  name CPin2D
+  xpos -647
+  ypos 31
+  addUserKnob {20 User}
+  addUserKnob {12 h1}
+  h1 {{(to1.x+to2.x)/2 i} {(to1.y+to2.y)/2 i}}
+  addUserKnob {12 h2}
+  h2 {{(to2.x+to3.x)/2 i} {(to2.y+to3.y)/2 i}}
+  addUserKnob {12 h3}
+  h3 {{(to3.x+to4.x)/2 i} {(to3.y+to4.y)/2 i}}
+  addUserKnob {12 h4}
+  h4 {{(to4.x+to1.x)/2 i} {(to4.y+to1.y)/2 i}}
+ }
+set N2516df50 [stack 0]
+push $N25165ff0
+ CornerPin2D {
+  to1 {{"(parent.CPin2D.to1 + parent.CPin2D1.to1)/2" i} {"(parent.CPin2D.to1 + parent.CPin2D1.to1)/2" i}}
+  to2 {{"(parent.CPin2D.to2 + parent.CPin2D1.to2)/2" i} {"(parent.CPin2D.to2 + parent.CPin2D1.to2)/2" i}}
+  to3 {{"(parent.CPin2D.to3 + parent.CPin2D1.to3)/2" i} {"(parent.CPin2D.to3 + parent.CPin2D1.to3)/2" i}}
+  to4 {{"(parent.CPin2D.to4 + parent.CPin2D1.to4)/2" i} {"(parent.CPin2D.to4 + parent.CPin2D1.to4)/2" i}}
+  invert false
+  from1 {{parent.CPin2D.from1 i} {parent.CPin2D.from1 i}}
+  from2 {{parent.CPin2D.from2 i} {parent.CPin2D.from2 i}}
+  from3 {{parent.CPin2D.from3 i} {parent.CPin2D.from3 i}}
+  from4 {{parent.CPin2D.from4 i} {parent.CPin2D.from4 i}}
+  name CPin2D2
+  xpos -413
+  ypos 30
+ }
+push $N25165ff0
+ CornerPin2D {
+  to1 {{parent.CPin2D.bbox.x i} {parent.CPin2D.bbox.y i}}
+  to2 {{parent.CPin2D.bbox.r i} {parent.CPin2D.bbox.y i}}
+  to3 {{parent.CPin2D.bbox.r i} {parent.CPin2D.bbox.t i}}
+  to4 {{parent.CPin2D.bbox.x i} {parent.CPin2D.bbox.t i}}
+  invert false
+  black_outside false
+  from1 {{parent.CPin2D.from1 i} {parent.CPin2D.from1 i}}
+  from2 {{parent.CPin2D.from2 i} {parent.CPin2D.from2 i}}
+  from3 {{parent.CPin2D.from3 i} {parent.CPin2D.from3 i}}
+  from4 {{parent.CPin2D.from4 i} {parent.CPin2D.from4 i}}
+  name CPin2D1
+  xpos -539
+  ypos 30
+ }
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge3
+  xpos -539
+  ypos 72
+ }
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge1
+  xpos -539
+  ypos 115
+ }
+ Blur {
+  channels rgba
+  size 50
+  crop false
+  name Blur3
+  xpos -539
+  ypos 166
+ }
+push $N2516df50
+ Merge2 {
+  inputs 2
+  operation under
+  bbox A
+  Achannels {rgba.red rgba.green rgba.blue -rgba.alpha}
+  name Merge2
+  xpos -647
+  ypos 197
+  disable {{parent.bout i}}
+ }
+ EdgeBlur {
+  size 40
+  name EdgeBlur1
+  xpos -647
+  ypos 238
+  disable {{parent.bout i}}
+ }
+ ModifyMetaData {
+  metadata {
+   {set version "Grad_CB 1.1"}
+  }
+  name MetaDataVersion
+  selected true
+  xpos -647
+  ypos 300
+ }
+ Output {
+  name Output1
+  xpos -647
+  ypos 345
+ }
+push $N2513bf60
+ NoOp {
+  name NoOp
+  xpos -542
+  ypos -122
+ }
+end_group

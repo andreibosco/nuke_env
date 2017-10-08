@@ -1,0 +1,226 @@
+#! C:/Program Files/Nuke8.0v1/nuke-8.0.v1.dll -nx
+version 8.0 v1
+Gizmo {
+ inputs 2
+ tile_color 0x6a55ffff
+ gl_color 0x6a55ffff
+ addUserKnob {20 ctrldimisp l Controls t "Control the strength of the filter"}
+ addUserKnob {30 ctrl_disp_str l Strength}
+ ctrl_disp_str {0 10}
+ addUserKnob {26 ""}
+ addUserKnob {16 ctrl_mask_filter l "DispMap Filter" t "Blurs the displacement mask for smoother edges."}
+ ctrl_mask_filter 10
+ addUserKnob {16 ctrl_UV_Filter l "Filter UV" t "Blurs the UV map for smoother result."}
+ ctrl_UV_Filter 5
+ addUserKnob {6 ctrl_reformat l "Auto Reformat Mask" t "This option allows you to automatically reformat your mask to the same size as your Source. Resize type is Distort." +STARTLINE}
+ ctrl_reformat true
+ addUserKnob {6 ctrl_clip_uv l "Clip UV" t "This option clips the UV between \[0,1]. This can prevent black/lines on edges." -STARTLINE}
+ ctrl_clip_uv true
+ addUserKnob {26 ""}
+ addUserKnob {4 disp_ctrl_channel l "DispMap Channel" M {Red Green Blue Alpha ""}}
+ addUserKnob {6 ctrl_RGB_mask l "Use RGB" t " If \"Use RGB\" is checked, this will use DispMap's Red and Green channels as seperate masks for X and Y displacement.\nThis overrides channel selection setting." -STARTLINE}
+ addUserKnob {26 DiMisplacement_Credits l INVISIBLE t "Gizmo created by Breidenbach Dimitri.\n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri" +INVISIBLE T "Gizmo created by Breidenbach Dimitri.\n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri"}
+ addUserKnob {20 Credits}
+ addUserKnob {26 credits l "" +STARTLINE T "Gizmo created by Breidenbach Dimitri.\n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri"}
+}
+ Input {
+  inputs 0
+  name DispMap
+  xpos -353
+  ypos -101
+  number 1
+ }
+ Reformat {
+  type "to box"
+  box_width {{DM_Format.width}}
+  box_height {{DM_Format.height}}
+  box_fixed true
+  resize distort
+  name DM_AutoReformat
+  xpos -353
+  ypos -1
+  disable {{!parent.ctrl_reformat}}
+ }
+ Blur {
+  size {{parent.ctrl_mask_filter}}
+  name DM_Mask_Filter
+  xpos -353
+  ypos 63
+ }
+set Nd692e60 [stack 0]
+ Dot {
+  name Dot2
+  xpos -319
+  ypos 124
+ }
+set Nd6931d0 [stack 0]
+ Dot {
+  name Dot6
+  xpos -319
+  ypos 174
+ }
+set Nd693540 [stack 0]
+ Dot {
+  name Dot5
+  xpos -319
+  ypos 225
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name DispMapAlpha
+  xpos -167
+  ypos 222
+  disable {{parent.ctrl_RGB_mask}}
+ }
+ Dot {
+  name Dot9
+  xpos 18
+  ypos 225
+ }
+push $Nd693540
+ Shuffle {
+  red blue
+  green blue
+  alpha blue
+  name DispMapBlue
+  xpos -167
+  ypos 171
+  disable {{parent.ctrl_RGB_mask}}
+ }
+push $Nd6931d0
+ Shuffle {
+  red green
+  blue green
+  alpha green
+  name DispMapGreen
+  xpos -167
+  ypos 121
+  disable {{parent.ctrl_RGB_mask}}
+ }
+ Dot {
+  name Dot8
+  xpos 19
+  ypos 124
+ }
+push $Nd692e60
+ Shuffle {
+  green red
+  blue red
+  alpha red
+  name DispMapRed
+  xpos -166
+  ypos 69
+  disable {{parent.ctrl_RGB_mask}}
+ }
+ Dot {
+  name Dot7
+  xpos 84
+  ypos 72
+ }
+ Switch {
+  inputs 4
+  which {{parent.disp_ctrl_channel}}
+  name DM_ChannelSwitch
+  xpos 50
+  ypos 171
+  disable {{parent.ctrl_RGB_mask}}
+ }
+set Ne27b320 [stack 0]
+ Dot {
+  name Dot3
+  xpos 84
+  ypos 257
+ }
+set Ne226bf0 [stack 0]
+ Dot {
+  name Dot4
+  xpos 84
+  ypos 314
+ }
+push $Ne226bf0
+push $Ne27b320
+ Input {
+  inputs 0
+  name Source
+  xpos 601
+  ypos -110
+ }
+ NoOp {
+  name DM_Format
+  xpos 601
+  ypos -5
+ }
+ Dot {
+  name Dot1
+  xpos 635
+  ypos 76
+ }
+set Ne227d20 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name DM_RemoveColor
+  xpos 486
+  ypos 73
+ }
+ Expression {
+  expr0 x/width
+  expr1 y/height
+  name DM_AutoUV
+  xpos 486
+  ypos 97
+ }
+ Grade {
+  inputs 1+1
+  white {{1-(parent.ctrl_disp_str.u/width*5)} 1 1 1}
+  black_clamp {{parent.ctrl_clip_uv}}
+  white_clamp {{parent.ctrl_clip_uv}}
+  maskChannelMask rgba.red
+  name DM_Strength_RED
+  xpos 486
+  ypos 171
+ }
+ Grade {
+  inputs 1+1
+  white {1 {1-(parent.ctrl_disp_str.v/height*5)} 1 1}
+  black_clamp {{parent.ctrl_clip_uv}}
+  white_clamp {{parent.ctrl_clip_uv}}
+  maskChannelMask rgba.green
+  name DM_Strength_GREEN
+  xpos 486
+  ypos 254
+ }
+ Blur {
+  inputs 1+1
+  size {{parent.ctrl_UV_Filter*10} {parent.ctrl_UV_Filter*10}}
+  name DM_Filter
+  xpos 486
+  ypos 305
+ }
+ Grade {
+  add {{0.5/width} {0.5/height} {curve} {curve}}
+  name STMap_error_PixelOffset_Correction
+  xpos 486
+  ypos 379
+ }
+push $Ne227d20
+ STMap {
+  inputs 2
+  uv rgb
+  blur_scale 0
+  filter Lanczos4
+  name DM_Displace
+  selected true
+  xpos 601
+  ypos 421
+ }
+ Output {
+  name DM_OUTPUT
+  xpos 601
+  ypos 589
+ }
+end_group

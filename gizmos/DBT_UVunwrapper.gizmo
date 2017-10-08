@@ -1,0 +1,139 @@
+#! C:/Program Files/Nuke8.0v1/nuke-8.0.v1.dll -nx
+version 8.0 v1
+Gizmo {
+ inputs 2
+ addUserKnob {20 Unwrapper}
+ addUserKnob {26 text l "" +STARTLINE T "Plug in UV Map and Beauty and it will output a square texture.\n\nYou can then use this as reference to position additional texture or paints.\n"}
+ addUserKnob {26 UNWRAPPER l "" t "Gizmo created by Breidenbach Dimitri. \n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri" -STARTLINE +INVISIBLE T "Gizmo created by Breidenbach Dimitri. \n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {6 ctrl_reformat l "Auto Reformat UV_Input" t "Allows you to automatically reformat the UV_Input to match the Beauty's format" +STARTLINE}
+ addUserKnob {20 Credits}
+ addUserKnob {26 credit_text l "" +STARTLINE T "Gizmo created by Breidenbach Dimitri. \n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri"}
+}
+ Camera2 {
+  inputs 0
+  translate {0 0 0.5}
+  projection_mode orthographic
+  focal 13.8
+  name UV_Unwrap_Camera
+  xpos 472
+  ypos 395
+  addUserKnob {20 Import_FOV}
+  addUserKnob {22 import_Button l Import -STARTLINE T "import dd_nukeFunctions\nreload(dd_nukeFunctions)\noNodeCamera = nuke.thisNode()\ndd_nukeFunctions.importFbxFov(oNodeCamera)\n\n"}
+  addUserKnob {20 Import_OpticalShift}
+  addUserKnob {22 import_opticButton l Import -STARTLINE T "import dd_nukeFunctions\nreload(dd_nukeFunctions)\noNodeCamera = nuke.thisNode()\ndd_nukeFunctions.importFbxOpticalShift(oNodeCamera)\n\n"}
+ }
+set Ncc7ccc0 [stack 0]
+push $Ncc7ccc0
+ Input {
+  inputs 0
+  name UV_Input
+  selected true
+  xpos 45
+  ypos 94
+ }
+ Reformat {
+  type "to box"
+  box_width {{DM_Format.width}}
+  box_height {{DM_Format.height}}
+  box_fixed true
+  resize distort
+  name DM_AutoReformat
+  xpos 45
+  ypos 151
+  disable {{!parent.ctrl_reformat}}
+ }
+ Dot {
+  name Dot5
+  label "UV Input"
+  note_font_size 20
+  note_font_color 0xff0000ff
+  xpos 79
+  ypos 260
+ }
+ Input {
+  inputs 0
+  name Beauty
+  xpos 352
+  ypos 99
+  number 1
+ }
+ NoOp {
+  name DM_Format
+  xpos 352
+  ypos 151
+ }
+ Dot {
+  name Dot6
+  label "Beauty Input"
+  note_font_size 20
+  note_font_color 0xff0000ff
+  xpos 386
+  ypos 203
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Merge_UV
+  xpos 352
+  ypos 245
+ }
+ PositionToPoints2 {
+  display textured
+  render_mode textured
+  cast_shadow false
+  receive_shadow false
+  P_channel forward
+  detail 0.75
+  pointSize 1
+  name UV_3D_Unwrap
+  xpos 352
+  ypos 301
+ }
+ TransformGeo {
+  translate {-0.5 -0.5 0}
+  name Unwrap_Recenter
+  xpos 352
+  ypos 354
+ }
+ Scene {
+  inputs 2
+  name Unwrap_Scene
+  xpos 362
+  ypos 395
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  format "1280 720 0 0 1280 720 1 HD720"
+  name BG_UV_Unwrap
+  xpos 180
+  ypos 470
+ }
+ ScanlineRender {
+  inputs 3
+  transparency false
+  ztest_enabled false
+  projection_mode orthographic
+  samples 0
+  name Unwrap_Render
+  xpos 352
+  ypos 494
+ }
+ Crop {
+  box {280 0 1000 720}
+  reformat true
+  crop false
+  name Unwrap_Crop
+  xpos 352
+  ypos 556
+ }
+ Output {
+  name UV_UNWRAP_OUTPUT
+  xpos 352
+  ypos 654
+ }
+end_group

@@ -1,0 +1,67 @@
+#! C:/Program Files/Nuke8.0v1/nuke-8.0.v1.dll -nx
+version 8.0 v1
+Gizmo {
+ addUserKnob {20 Control l "Texture Offset"}
+ addUserKnob {41 OffsetXY l "Offset Control" T OffsetTile.translate}
+ addUserKnob {20 Credits}
+ addUserKnob {26 credits l "" +STARTLINE T "Gizmo created by Breidenbach Dimitri. \n\nContact: breidenbach.dimitri@gmail.com\nLinkedIN: linkedin.com/in/breidenbachdimitri"}
+}
+ Input {
+  inputs 0
+  name Source
+  xpos -678
+  ypos -384
+ }
+ Dot {
+  name Dot22
+  xpos -644
+  ypos -344
+ }
+set Ncbdf770 [stack 0]
+ Expression {
+  expr0 x/width
+  expr1 y/height
+  expr2 0
+  name UVMap_Creation
+  xpos -515
+  ypos -347
+ }
+ Grade {
+  add {{-parent.OffsetTile.translate/width} {-parent.OffsetTile.translate/height} 0 0}
+  black_clamp false
+  name OffsetGrade
+  xpos -515
+  ypos -305
+ }
+ Expression {
+  expr0 r-floor(r)
+  expr1 g-floor(g)
+  name Magic_UVTiling_Expression
+  xpos -515
+  ypos -271
+ }
+push $Ncbdf770
+ STMap {
+  inputs 2
+  uv rgb
+  filter Impulse
+  name ApplyOffset
+  xpos -515
+  ypos -206
+ }
+ Output {
+  name OFFSET_OUTPUT
+  xpos -515
+  ypos -106
+ }
+push $Ncbdf770
+ Transform {
+  scale {1 1}
+  center {{width/2 x1 0} {height/2 x1 0}}
+  filter Impulse
+  black_outside false
+  name OffsetTile
+  xpos -678
+  ypos -304
+ }
+end_group

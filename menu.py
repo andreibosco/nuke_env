@@ -43,6 +43,8 @@ m.addCommand('Offset', "nuke.createNode('Offset')")
 # m.addCommand('RepTile', "nuke.createNode('RepTile')")
 m.addCommand('glitch', "nuke.createNode('glitch')")
 m.addCommand('NS_EKG', "nuke.createNode('NS_EKG')")
+m.addCommand("Extrude", "nuke.createNode('Extrude')")
+m.addCommand("TX_Fog", "nuke.createNode('TX_Fog')")
 
 ## BL Tools
 toolbar.addMenu('BL', 'BL.png')
